@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.http import JsonResponse
 from ..forms import IdeaForm
 from ..models import Idea, Project
 from ..utils import augment_idea_with_ai
@@ -9,7 +10,11 @@ import json
 @login_required
 def idea_list(request):
     ideas = Idea.objects.filter(creator=request.user)
-    return render(request, 'founder_assistance/idea_list.html', {'ideas': ideas})
+    form = IdeaForm()  # Create a new form instance for the modal
+    return render(request, 'founder_assistance/idea_list.html', {
+        'ideas': ideas,
+        'form': form  # Pass the form to the template
+    })
 
 @login_required
 def idea_create(request):
@@ -34,15 +39,46 @@ def idea_create(request):
                 idea.description = augmented_data
                 idea.save()
                 
-                messages.success(request, 'Idea created successfully with AI-enhanced analysis!')
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({
+                        'success': True,
+                        'idea': {
+                            'id': idea.id,
+                            'title': idea.title,
+                            'description': analysis.get('analysis', {}).get('refined_idea', {}).get('enhanced_description', description)
+                        }
+                    })
+                else:
+                    messages.success(request, 'Idea created successfully with AI-enhanced analysis!')
+                    return redirect('founder_assistance:idea_list')
             except Exception as e:
                 # If AI augmentation fails, save the original idea
                 idea.save()
-                messages.warning(request, f'Idea saved with original description. AI enhancement failed: {str(e)}')
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({
+                        'success': True,
+                        'warning': f'Idea saved with original description. AI enhancement failed: {str(e)}',
+                        'idea': {
+                            'id': idea.id,
+                            'title': idea.title,
+                            'description': description
+                        }
+                    })
+                else:
+                    messages.warning(request, f'Idea saved with original description. AI enhancement failed: {str(e)}')
+                    return redirect('founder_assistance:idea_list')
+        else:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': False,
+                    'errors': form.errors
+                })
             
-            return redirect('founder_assistance:idea_list')
     else:
         form = IdeaForm()
+    
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return JsonResponse({'success': False, 'errors': {'form': 'Invalid request method'}})
     return render(request, 'founder_assistance/idea_form.html', {'form': form})
 
 @login_required

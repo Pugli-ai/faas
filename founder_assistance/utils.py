@@ -76,7 +76,7 @@ def augment_idea_with_ai(title, description):
     
     try:
         response = client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4o",
             messages=[
                 {"role": "system", "content": "You are an experienced business strategist and startup advisor. You always respond with valid JSON."},
                 {"role": "user", "content": prompt}

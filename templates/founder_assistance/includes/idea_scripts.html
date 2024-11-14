@@ -1,4 +1,5 @@
 <script>
+// Existing functions
 function toggleSection(sectionId) {
     const section = document.getElementById(sectionId);
     if (section) {
@@ -11,4 +12,142 @@ function confirmDelete(ideaId) {
         document.getElementById('delete-form-' + ideaId).submit();
     }
 }
+
+// Create idea card HTML
+function createIdeaCard(idea) {
+    return `
+    <div class="card mb-5 mb-xl-8">
+        <div class="card-header border-0 pt-5">
+            <h3 class="card-title align-items-start flex-column">
+                <span class="card-label fw-bold fs-3 mb-1">${idea.title}</span>
+                <span class="text-muted mt-1 fw-semibold fs-7">Created just now</span>
+            </h3>
+            <div class="card-toolbar">
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-light btn-active-light-primary" type="button" data-bs-toggle="dropdown">
+                        Actions
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end">
+                        <form method="post" action="/ideas/${idea.id}/convert/" class="dropdown-item">
+                            <input type="hidden" name="csrfmiddlewaretoken" value="${document.querySelector('[name=csrfmiddlewaretoken]').value}">
+                            <button type="submit" class="bg-transparent border-0 p-0 w-100 text-start">
+                                Convert to Project
+                            </button>
+                        </form>
+                        <form id="delete-form-${idea.id}" method="post" action="/ideas/${idea.id}/delete/" class="dropdown-item">
+                            <input type="hidden" name="csrfmiddlewaretoken" value="${document.querySelector('[name=csrfmiddlewaretoken]').value}">
+                            <button type="button" class="bg-transparent border-0 p-0 w-100 text-start" onclick="confirmDelete(${idea.id})">
+                                Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body py-3">
+            <div class="fs-6 fw-semibold text-gray-600 mb-5">
+                ${idea.description}
+            </div>
+        </div>
+    </div>`;
+}
+
+// Modal form handling
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('kt_modal_create_idea_form');
+    const submitButton = document.getElementById('kt_modal_create_idea_submit');
+    const modal = document.getElementById('kt_modal_create_idea');
+    const modalElement = new bootstrap.Modal(modal);
+    const loadingOverlay = document.getElementById('loading-overlay');
+    const emptyState = document.querySelector('.card-px'); // Get empty state container if it exists
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        // Disable submit button and show loading state
+        submitButton.setAttribute('data-kt-indicator', 'on');
+        submitButton.disabled = true;
+
+        // Get form data
+        const formData = new FormData(form);
+
+        // Make AJAX request
+        fetch('{% url "founder_assistance:idea_create" %}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Hide modal
+                modalElement.hide();
+                
+                // Show loading overlay
+                loadingOverlay.style.opacity = '0';
+                loadingOverlay.classList.remove('d-none');
+                loadingOverlay.classList.add('d-flex');
+                loadingOverlay.offsetHeight; // Trigger reflow
+                loadingOverlay.style.transition = 'opacity 0.3s ease-in-out';
+                loadingOverlay.style.opacity = '1';
+
+                // After 2 seconds, hide overlay and update content
+                setTimeout(() => {
+                    loadingOverlay.style.opacity = '0';
+                    setTimeout(() => {
+                        loadingOverlay.classList.remove('d-flex');
+                        loadingOverlay.classList.add('d-none');
+
+                        // Remove empty state if it exists
+                        if (emptyState) {
+                            emptyState.remove();
+                        }
+
+                        // Create and add new idea card
+                        const ideaCard = createIdeaCard(data.idea);
+                        const container = document.querySelector('.col-xl-12');
+                        container.insertAdjacentHTML('afterbegin', ideaCard);
+
+                        // Reset form
+                        form.reset();
+                    }, 300);
+                }, 2000);
+            } else {
+                // Show validation errors
+                Object.keys(data.errors).forEach(field => {
+                    const input = form.querySelector(`[name="${field}"]`);
+                    const feedback = input.nextElementSibling.nextElementSibling;
+                    feedback.textContent = data.errors[field].join(' ');
+                    input.classList.add('is-invalid');
+                });
+
+                // Reset submit button
+                submitButton.removeAttribute('data-kt-indicator');
+                submitButton.disabled = false;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // Reset submit button
+            submitButton.removeAttribute('data-kt-indicator');
+            submitButton.disabled = false;
+        });
+    });
+
+    // Reset form when modal is hidden
+    modal.addEventListener('hidden.bs.modal', function () {
+        form.reset();
+        form.querySelectorAll('.is-invalid').forEach(input => {
+            input.classList.remove('is-invalid');
+        });
+        form.querySelectorAll('.invalid-feedback').forEach(feedback => {
+            feedback.textContent = '';
+        });
+        submitButton.removeAttribute('data-kt-indicator');
+        submitButton.disabled = false;
+    });
+});
 </script>

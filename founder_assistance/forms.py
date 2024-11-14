@@ -62,7 +62,17 @@ class IdeaForm(forms.ModelForm):
         model = Idea
         fields = ['title', 'description']
         widgets = {
-            'description': forms.Textarea(attrs={'rows': 4}),
+            'title': forms.TextInput(attrs={
+                'class': 'form-control form-control-solid',
+                'placeholder': 'Enter your idea title',
+                'required': 'required'
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'form-control form-control-solid',
+                'placeholder': 'Describe your idea in detail. Include the problem it solves and how it works.',
+                'rows': 4,
+                'required': 'required'
+            }),
         }
 
 class ProjectForm(forms.ModelForm):
