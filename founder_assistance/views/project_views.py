@@ -1,8 +1,11 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
 from ..models import Project
 from ..forms import ProjectForm
+from ..utils import generate_market_analysis, generate_competitor_analysis
 import json
 
 @login_required
@@ -21,6 +24,56 @@ def project_detail(request, project_id):
         'ai_insights': get_project_insights(project)
     }
     return render(request, 'founder_assistance/project_detail.html', context)
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def project_market_analysis(request, project_id):
+    project = get_object_or_404(Project, id=project_id)
+    
+    # Check if user has permission to view
+    if project.creator != request.user and request.user not in project.team_members.all():
+        messages.error(request, "You don't have permission to view this project's market analysis.")
+        return redirect('founder_assistance:project_detail', project_id=project_id)
+    
+    # Handle AJAX request for analysis generation
+    if request.method == "POST" and request.GET.get('generate') == 'true':
+        try:
+            analysis_result = generate_market_analysis(project)
+            return JsonResponse({'result': analysis_result})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    
+    # Regular page load
+    context = {
+        'project': project,
+        'analysis_result': None  # Initially empty, will be populated by AJAX
+    }
+    return render(request, 'founder_assistance/project_market_analysis.html', context)
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def project_competitor_analysis(request, project_id):
+    project = get_object_or_404(Project, id=project_id)
+    
+    # Check if user has permission to view
+    if project.creator != request.user and request.user not in project.team_members.all():
+        messages.error(request, "You don't have permission to view this project's competitor analysis.")
+        return redirect('founder_assistance:project_detail', project_id=project_id)
+    
+    # Handle AJAX request for analysis generation
+    if request.method == "POST" and request.GET.get('generate') == 'true':
+        try:
+            analysis_result = generate_competitor_analysis(project)
+            return JsonResponse({'result': analysis_result})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    
+    # Regular page load
+    context = {
+        'project': project,
+        'analysis_result': None  # Initially empty, will be populated by AJAX
+    }
+    return render(request, 'founder_assistance/project_competitor_analysis.html', context)
 
 @login_required
 def project_edit(request, project_id):

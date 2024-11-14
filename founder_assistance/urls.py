@@ -1,7 +1,10 @@
 from django.urls import path
 from django.contrib.auth.views import LogoutView
 from . import views
-from .views.project_views import project_list, project_detail, project_edit
+from .views.project_views import (
+    project_list, project_detail, project_edit,
+    project_market_analysis, project_competitor_analysis
+)
 
 app_name = 'founder_assistance'
 
@@ -18,5 +21,7 @@ urlpatterns = [
     path('projects/', project_list, name='project_list'),
     path('project/<int:project_id>/', project_detail, name='project_detail'),
     path('project/<int:project_id>/edit/', project_edit, name='project_edit'),
+    path('project/<int:project_id>/market-analysis/', project_market_analysis, name='project_market_analysis'),
+    path('project/<int:project_id>/competitor-analysis/', project_competitor_analysis, name='project_competitor_analysis'),
     path('resources/', views.resources, name='resources'),
 ]
