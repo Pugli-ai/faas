@@ -12,6 +12,7 @@ urlpatterns = [
     path('profile/', views.profile_view, name='profile'),
     path('ideas/', views.idea_list, name='idea_list'),
     path('ideas/create/', views.idea_create, name='idea_create'),
+    path('ideas/<int:idea_id>/convert/', views.convert_to_project, name='convert_to_project'),
     path('projects/', views.project_list, name='project_list'),
     path('project/<int:project_id>/', views.project_detail, name='project_detail'),
     path('resources/', views.resources, name='resources'),
