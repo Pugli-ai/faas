@@ -29,14 +29,14 @@ def project_edit(request, project_id):
     # Check if user has permission to edit
     if project.creator != request.user and request.user not in project.team_members.all():
         messages.error(request, "You don't have permission to edit this project.")
-        return redirect('project_detail', project_id=project_id)
+        return redirect('founder_assistance:project_detail', project_id=project_id)
     
     if request.method == 'POST':
         form = ProjectForm(request.POST, instance=project)
         if form.is_valid():
             form.save()
             messages.success(request, 'Project updated successfully.')
-            return redirect('project_detail', project_id=project_id)
+            return redirect('founder_assistance:project_detail', project_id=project_id)
     else:
         form = ProjectForm(instance=project)
     

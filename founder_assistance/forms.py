@@ -80,14 +80,16 @@ class ProjectForm(forms.ModelForm):
         model = Project
         fields = [
             'title', 'description', 'status', 'progress',
-            'budget', 'start_date', 'end_date', 'team_members',
-            'related_idea'
+            'budget', 'earnings', 'start_date', 'end_date', 
+            'team_members', 'related_idea'
         ]
         widgets = {
             'description': forms.Textarea(attrs={'rows': 4}),
             'start_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
             'end_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
             'team_members': forms.SelectMultiple(attrs={'class': 'select2'}),
+            'budget': forms.NumberInput(attrs={'step': '0.01'}),
+            'earnings': forms.NumberInput(attrs={'step': '0.01'}),
         }
 
 class ProjectTimelineForm(forms.ModelForm):

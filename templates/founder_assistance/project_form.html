@@ -1,13 +1,25 @@
 {% extends "founder_assistance/base.html" %}
 
 {% block content %}
+<!--begin::Card-->
 <div class="card mb-5 mb-xl-10">
+    <!--begin::Card header-->
     <div class="card-header border-0">
         <div class="card-title m-0">
             <h3 class="fw-bold m-0">{% if is_edit %}Edit{% else %}Create{% endif %} Project</h3>
         </div>
     </div>
+    <!--end::Card header-->
+
+    <!--begin::Card body-->
     <div class="card-body border-top p-9">
+        <!--begin::Heading-->
+        <div class="mb-13">
+            <h4 class="mb-3">Project Details</h4>
+            <div class="text-muted fw-semibold fs-5">Fill in the details below to {% if is_edit %}update{% else %}create{% endif %} your project. All required fields are marked with <span class="required"></span></div>
+        </div>
+        <!--end::Heading-->
+
         <form method="post" class="form">
             {% csrf_token %}
             
@@ -17,125 +29,199 @@
             </div>
             {% endif %}
 
-            <div class="row mb-6">
-                <div class="col-12">
-                    <label class="form-label required">Title</label>
-                    {{ form.title }}
-                    {% if form.title.errors %}
-                    <div class="invalid-feedback d-block">
-                        {{ form.title.errors }}
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
+            <!--begin::Basic info section-->
+            <div class="mb-15">
+                <h4 class="text-gray-800 mb-7">Basic Information</h4>
 
-            <div class="row mb-6">
-                <div class="col-12">
-                    <label class="form-label required">Description</label>
-                    {{ form.description }}
-                    {% if form.description.errors %}
-                    <div class="invalid-feedback d-block">
-                        {{ form.description.errors }}
+                <!--begin::Input group-->
+                <div class="row mb-8">
+                    <div class="col-12">
+                        <label class="form-label required">Title</label>
+                        {{ form.title }}
+                        <div class="text-muted fs-7 mt-2">Enter a clear, descriptive name for your project</div>
+                        {% if form.title.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.title.errors }}
+                        </div>
+                        {% endif %}
                     </div>
-                    {% endif %}
                 </div>
-            </div>
+                <!--end::Input group-->
 
-            <div class="row mb-6">
-                <div class="col-md-6">
-                    <label class="form-label required">Status</label>
-                    {{ form.status }}
-                    {% if form.status.errors %}
-                    <div class="invalid-feedback d-block">
-                        {{ form.status.errors }}
+                <!--begin::Input group-->
+                <div class="row mb-8">
+                    <div class="col-12">
+                        <label class="form-label required">Description</label>
+                        {{ form.description }}
+                        <div class="text-muted fs-7 mt-2">Provide a detailed description of your project, including its goals, scope, and expected outcomes</div>
+                        {% if form.description.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.description.errors }}
+                        </div>
+                        {% endif %}
                     </div>
-                    {% endif %}
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label required">Progress (%)</label>
-                    {{ form.progress }}
-                    {% if form.progress.errors %}
-                    <div class="invalid-feedback d-block">
-                        {{ form.progress.errors }}
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
+                <!--end::Input group-->
 
-            <div class="row mb-6">
-                <div class="col-md-6">
-                    <label class="form-label required">Budget</label>
-                    {{ form.budget }}
-                    {% if form.budget.errors %}
-                    <div class="invalid-feedback d-block">
-                        {{ form.budget.errors }}
+                <!--begin::Input group-->
+                <div class="row mb-8">
+                    <div class="col-md-6">
+                        <label class="form-label">Related Idea</label>
+                        {{ form.related_idea }}
+                        <div class="text-muted fs-7 mt-2">Connect this project to an existing idea (optional)</div>
+                        {% if form.related_idea.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.related_idea.errors }}
+                        </div>
+                        {% endif %}
                     </div>
-                    {% endif %}
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label">Related Idea</label>
-                    {{ form.related_idea }}
-                    {% if form.related_idea.errors %}
-                    <div class="invalid-feedback d-block">
-                        {{ form.related_idea.errors }}
-                    </div>
-                    {% endif %}
-                </div>
+                <!--end::Input group-->
             </div>
+            <!--end::Basic info section-->
 
-            <div class="row mb-6">
-                <div class="col-md-6">
-                    <label class="form-label required">Start Date</label>
-                    {{ form.start_date }}
-                    {% if form.start_date.errors %}
-                    <div class="invalid-feedback d-block">
-                        {{ form.start_date.errors }}
-                    </div>
-                    {% endif %}
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">End Date</label>
-                    {{ form.end_date }}
-                    {% if form.end_date.errors %}
-                    <div class="invalid-feedback d-block">
-                        {{ form.end_date.errors }}
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
+            <!--begin::Project status section-->
+            <div class="mb-15">
+                <h4 class="text-gray-800 mb-7">Status & Progress</h4>
 
-            <div class="row mb-6">
-                <div class="col-12">
-                    <label class="form-label">Team Members</label>
-                    {{ form.team_members }}
-                    {% if form.team_members.errors %}
-                    <div class="invalid-feedback d-block">
-                        {{ form.team_members.errors }}
+                <!--begin::Input group-->
+                <div class="row mb-8">
+                    <div class="col-md-6">
+                        <label class="form-label required">Status</label>
+                        {{ form.status }}
+                        <div class="text-muted fs-7 mt-2">Select the current status of your project</div>
+                        {% if form.status.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.status.errors }}
+                        </div>
+                        {% endif %}
                     </div>
-                    {% endif %}
+                    <div class="col-md-6">
+                        <label class="form-label required">Progress (%)</label>
+                        {{ form.progress }}
+                        <div class="text-muted fs-7 mt-2">Enter the overall completion percentage (0-100)</div>
+                        {% if form.progress.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.progress.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
                 </div>
+                <!--end::Input group-->
             </div>
+            <!--end::Project status section-->
 
-            <div class="card-footer d-flex justify-content-end py-6 px-9">
-                <a href="{% url 'founder_assistance:project_detail' project.id %}" class="btn btn-light btn-active-light-primary me-2">Cancel</a>
-                <button type="submit" class="btn btn-primary">Save Changes</button>
+            <!--begin::Timeline section-->
+            <div class="mb-15">
+                <h4 class="text-gray-800 mb-7">Timeline & Financials</h4>
+
+                <!--begin::Input group-->
+                <div class="row mb-8">
+                    <div class="col-md-6">
+                        <label class="form-label required">Start Date</label>
+                        {{ form.start_date }}
+                        <div class="text-muted fs-7 mt-2">When will/did the project begin?</div>
+                        {% if form.start_date.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.start_date.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">End Date</label>
+                        {{ form.end_date }}
+                        <div class="text-muted fs-7 mt-2">Expected completion date (optional)</div>
+                        {% if form.end_date.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.end_date.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <!--end::Input group-->
+
+                <!--begin::Input group-->
+                <div class="row mb-8">
+                    <div class="col-md-6">
+                        <label class="form-label required">Budget</label>
+                        {{ form.budget }}
+                        <div class="text-muted fs-7 mt-2">Estimated total budget for the project</div>
+                        {% if form.budget.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.budget.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Earnings</label>
+                        {{ form.earnings }}
+                        <div class="text-muted fs-7 mt-2">Current earnings from the project</div>
+                        {% if form.earnings.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.earnings.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <!--end::Input group-->
             </div>
+            <!--end::Timeline section-->
+
+            <!--begin::Team section-->
+            <div class="mb-15">
+                <h4 class="text-gray-800 mb-7">Team</h4>
+
+                <!--begin::Input group-->
+                <div class="row mb-8">
+                    <div class="col-12">
+                        <label class="form-label">Team Members</label>
+                        {{ form.team_members }}
+                        <div class="text-muted fs-7 mt-2">Select team members who will be working on this project</div>
+                        {% if form.team_members.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.team_members.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <!--end::Input group-->
+            </div>
+            <!--end::Team section-->
+
+            <!--begin::Form actions-->
+            <div class="d-flex justify-content-end">
+                <a href="{% url 'founder_assistance:project_list' %}" class="btn btn-light me-3">
+                    <i class="ki-duotone ki-arrow-left fs-2"></i>Cancel
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="ki-duotone ki-check fs-2"></i>{% if is_edit %}Update{% else %}Create{% endif %} Project
+                </button>
+            </div>
+            <!--end::Form actions-->
         </form>
     </div>
+    <!--end::Card body-->
 </div>
+<!--end::Card-->
 {% endblock %}
 
 {% block extra_scripts %}
 <script>
-    // Initialize select2 for team members
     $(document).ready(function() {
+        // Initialize select2 for team members
         $('.select2').select2({
             placeholder: "Select team members",
             allowClear: true
         });
 
-        // Add form-control class to all form inputs
+        // Add form-control classes to inputs
         $('input:not([type="checkbox"]), select, textarea').addClass('form-control form-control-solid');
+
+        // Initialize date pickers
+        $('input[type="date"]').flatpickr({
+            dateFormat: "Y-m-d",
+            allowInput: true
+        });
     });
 </script>
 {% endblock %}
