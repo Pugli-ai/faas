@@ -59,6 +59,10 @@ class Project(models.Model):
     start_date = models.DateTimeField(default=timezone.now)  # Added default
     end_date = models.DateTimeField(null=True, blank=True)
     
+    # AI Analysis Fields
+    ai_response_raw = models.TextField(null=True, blank=True)  # Store raw AI response
+    ai_response_json = models.JSONField(null=True, blank=True)  # Store structured JSON response
+    
     # Relationships
     creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_projects', null=True)
     team_members = models.ManyToManyField(User, related_name='project_teams')

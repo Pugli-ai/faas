@@ -47,9 +47,156 @@
             <!--end::Loading state-->
 
             <!--begin::Analysis content-->
-            <div class="markdown-content" id="analysisContent">
-                {% if analysis_result %}
-                    {{ analysis_result|safe }}
+            <div id="analysisContent">
+                {% if project.ai_response_json %}
+                    <!-- Market Overview Section -->
+                    <div class="card mb-5 shadow-sm">
+                        <div class="card-header">
+                            <h3 class="card-title">Market Overview</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <h4>Key Players</h4>
+                                    <ul class="list-unstyled">
+                                    {% for player in project.ai_response_json.market_overview.key_players %}
+                                        <li><i class="fas fa-check text-success me-2"></i>{{ player }}</li>
+                                    {% endfor %}
+                                    </ul>
+                                </div>
+                                <div class="col-md-4">
+                                    <h4>Market Share</h4>
+                                    <p>{{ project.ai_response_json.market_overview.market_share }}</p>
+                                </div>
+                                <div class="col-md-4">
+                                    <h4>Competitive Intensity</h4>
+                                    <p>{{ project.ai_response_json.market_overview.competitive_intensity }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Competitors Section -->
+                    <div class="card mb-5 shadow-sm">
+                        <div class="card-header">
+                            <h3 class="card-title">Competitors</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-row-bordered table-row-gray-100 align-middle gs-0 gy-3">
+                                    <thead>
+                                        <tr class="fw-bold text-muted">
+                                            <th>Company</th>
+                                            <th>Business Model</th>
+                                            <th>Target Market</th>
+                                            <th>Key Products/Services</th>
+                                            <th>Strengths</th>
+                                            <th>Weaknesses</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for competitor in project.ai_response_json.competitors %}
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="d-flex justify-content-start flex-column">
+                                                        <span class="text-dark fw-bold mb-1">{{ competitor.name }}</span>
+                                                        <span class="text-muted fw-semibold d-block">{{ competitor.website }}</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>{{ competitor.business_model }}</td>
+                                            <td>{{ competitor.target_market }}</td>
+                                            <td>
+                                                <ul class="list-unstyled mb-0">
+                                                {% for product in competitor.products_services %}
+                                                    <li><i class="fas fa-circle text-primary me-2" style="font-size: 0.5rem;"></i>{{ product }}</li>
+                                                {% endfor %}
+                                                </ul>
+                                            </td>
+                                            <td>
+                                                <ul class="list-unstyled mb-0">
+                                                {% for strength in competitor.strengths %}
+                                                    <li><i class="fas fa-plus text-success me-2"></i>{{ strength }}</li>
+                                                {% endfor %}
+                                                </ul>
+                                            </td>
+                                            <td>
+                                                <ul class="list-unstyled mb-0">
+                                                {% for weakness in competitor.weaknesses %}
+                                                    <li><i class="fas fa-minus text-danger me-2"></i>{{ weakness }}</li>
+                                                {% endfor %}
+                                                </ul>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Strategies Section -->
+                    <div class="card mb-5 shadow-sm">
+                        <div class="card-header">
+                            <h3 class="card-title">Competitor Strategies</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <h4>Business Models</h4>
+                                    <ul class="list-unstyled">
+                                    {% for model in project.ai_response_json.competitor_strategies.business_models %}
+                                        <li><i class="fas fa-check text-success me-2"></i>{{ model }}</li>
+                                    {% endfor %}
+                                    </ul>
+                                </div>
+                                <div class="col-md-4">
+                                    <h4>Marketing Approaches</h4>
+                                    <ul class="list-unstyled">
+                                    {% for approach in project.ai_response_json.competitor_strategies.marketing_approaches %}
+                                        <li><i class="fas fa-check text-success me-2"></i>{{ approach }}</li>
+                                    {% endfor %}
+                                    </ul>
+                                </div>
+                                <div class="col-md-4">
+                                    <h4>Technology Stacks</h4>
+                                    <ul class="list-unstyled">
+                                    {% for tech in project.ai_response_json.competitor_strategies.technology_stacks %}
+                                        <li><i class="fas fa-check text-success me-2"></i>{{ tech }}</li>
+                                    {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Market Gaps Section -->
+                    <div class="card mb-5 shadow-sm">
+                        <div class="card-header">
+                            <h3 class="card-title">Market Gaps & Opportunities</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h4>Underserved Segments</h4>
+                                    <ul class="list-unstyled">
+                                    {% for segment in project.ai_response_json.market_gaps.underserved_segments %}
+                                        <li><i class="fas fa-exclamation-circle text-warning me-2"></i>{{ segment }}</li>
+                                    {% endfor %}
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <h4>Opportunities</h4>
+                                    <ul class="list-unstyled">
+                                    {% for opportunity in project.ai_response_json.market_gaps.opportunities %}
+                                        <li><i class="fas fa-lightbulb text-primary me-2"></i>{{ opportunity }}</li>
+                                    {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 {% else %}
                     <div class="text-center py-10">
                         <i class="fas fa-search fa-3x text-muted mb-3"></i>
@@ -70,68 +217,32 @@
 
 {% block extra_css %}
 <style>
-    .markdown-content {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        line-height: 1.6;
-        color: #333;
-        max-width: 100%;
-        margin: 0 auto;
-        padding: 20px;
+    .card {
+        border: none;
+        margin-bottom: 1.5rem;
     }
-
-    .markdown-content h1 {
-        font-size: 2em;
-        border-bottom: 2px solid #eaecef;
-        padding-bottom: .3em;
-        margin-bottom: 16px;
+    
+    .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #ebedf3;
     }
-
-    .markdown-content h2 {
-        font-size: 1.5em;
-        border-bottom: 1px solid #eaecef;
-        padding-bottom: .3em;
-        margin-top: 24px;
-        margin-bottom: 16px;
+    
+    .shadow-sm {
+        box-shadow: 0 .125rem .25rem rgba(0,0,0,.075)!important;
     }
-
-    .markdown-content p {
-        margin-bottom: 16px;
+    
+    .list-unstyled li {
+        margin-bottom: 0.5rem;
     }
-
-    .markdown-content a {
-        color: #0366d6;
-        text-decoration: none;
+    
+    .table th {
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
     }
-
-    .markdown-content a:hover {
-        text-decoration: underline;
-    }
-
-    .markdown-content ul {
-        padding-left: 2em;
-        margin-bottom: 16px;
-    }
-
-    .markdown-content li {
-        margin: 0.25em 0;
-    }
-
-    .markdown-content code {
-        padding: 0.2em 0.4em;
-        margin: 0;
-        font-size: 85%;
-        background-color: rgba(27,31,35,0.05);
-        border-radius: 3px;
-    }
-
-    .markdown-content pre {
-        padding: 16px;
-        overflow: auto;
-        font-size: 85%;
-        line-height: 1.45;
-        background-color: #f6f8fa;
-        border-radius: 3px;
-        margin-bottom: 16px;
+    
+    .table td {
+        vertical-align: middle;
     }
 </style>
 {% endblock %}
@@ -177,8 +288,8 @@ function generateAnalysis() {
         document.getElementById('analysisContent').classList.remove('d-none');
         document.getElementById('generateBtn').disabled = false;
 
-        // Update content
-        document.getElementById('analysisContent').innerHTML = data.result;
+        // Reload the page to show new analysis
+        window.location.reload();
     })
     .catch(error => {
         console.error('Error:', error);

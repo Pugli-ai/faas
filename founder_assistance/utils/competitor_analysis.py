@@ -23,7 +23,7 @@ def create_competitor_analysis_crew(project_title, project_description, idea_des
         role='Competitor Research Specialist',
         goal='Find and analyze direct and indirect competitors in the market',
         verbose=True,
-        model='gpt-4',
+        model='gpt-4o',
         memory=True,
         backstory="An expert in competitive analysis, skilled at identifying and analyzing competitor companies.",
         tools=[search_tool]
@@ -43,48 +43,61 @@ def create_competitor_analysis_crew(project_title, project_description, idea_des
     if idea_description:
         search_context += f"\nIdea Details: {idea_description}"
 
-    # Create search task
+    # Create search task with JSON structure requirement
     finder_task = Task(
         description=(
             f"Research competitors for: {search_context}\n"
-            "For each competitor found, gather:\n"
-            "- Company name and website\n"
-            "- Brief description\n"
-            "- Business model\n"
-            "- Target market\n"
-            "- Key products/services\n"
-            "- Funding information\n"
-            "- Strengths and weaknesses\n"
-            "- Market positioning\n"
-            "- Unique selling propositions"
+            "Return the data as a JSON object with the following structure for each competitor and do not include any trailing text:\n"
+            "{\n"
+            '  "competitors": [\n'
+            "    {\n"
+            '      "name": "Company name",\n'
+            '      "website": "Company website",\n'
+            '      "description": "Brief description",\n'
+            '      "business_model": "Business model details",\n'
+            '      "target_market": "Target market details",\n'
+            '      "products_services": ["Key product 1", "Key service 1"],\n'
+            '      "funding": "Funding information",\n'
+            '      "strengths": ["Strength 1", "Strength 2"],\n'
+            '      "weaknesses": ["Weakness 1", "Weakness 2"],\n'
+            '      "market_position": "Market positioning details",\n'
+            '      "unique_selling_points": ["USP 1", "USP 2"]\n'
+            "    }\n"
+            "  ]\n"
+            "}"
         ),
-        expected_output='A comprehensive list of competitors with detailed information about each.',
+        expected_output='A JSON object containing detailed competitor information',
         tools=[search_tool],
         agent=competitor_finder
     )
 
-    # Create analysis task
+    # Create analysis task with JSON structure requirement
     analyzer_task = Task(
         description=(
-            "Analyze the competitor data and provide insights:\n"
-            "1. Competitor Overview:\n"
-            "   - Key players in the market\n"
-            "   - Market share distribution\n"
-            "   - Competitive intensity\n"
-            "2. Competitor Strategies:\n"
-            "   - Business models\n"
-            "   - Marketing approaches\n"
-            "   - Technology stacks\n"
-            "3. Competitive Advantages:\n"
-            "   - Key differentiators\n"
-            "   - Unique features\n"
-            "   - Value propositions\n"
-            "4. Market Gaps:\n"
-            "   - Underserved segments\n"
-            "   - Opportunity areas\n"
-            "Format the output as a structured markdown report with sections for each competitor"
+            "Analyze the competitor data and provide insights in the following JSON structure:\n"
+            "{\n"
+            '  "market_overview": {\n'
+            '    "key_players": ["Player 1", "Player 2"],\n'
+            '    "market_share": "Distribution details",\n'
+            '    "competitive_intensity": "Analysis of competition level"\n'
+            "  },\n"
+            '  "competitor_strategies": {\n'
+            '    "business_models": ["Model 1", "Model 2"],\n'
+            '    "marketing_approaches": ["Approach 1", "Approach 2"],\n'
+            '    "technology_stacks": ["Tech 1", "Tech 2"]\n'
+            "  },\n"
+            '  "competitive_advantages": {\n'
+            '    "differentiators": ["Diff 1", "Diff 2"],\n'
+            '    "unique_features": ["Feature 1", "Feature 2"],\n'
+            '    "value_propositions": ["Value 1", "Value 2"]\n'
+            "  },\n"
+            '  "market_gaps": {\n'
+            '    "underserved_segments": ["Segment 1", "Segment 2"],\n'
+            '    "opportunities": ["Opportunity 1", "Opportunity 2"]\n'
+            "  }\n"
+            "}"
         ),
-        expected_output='A detailed markdown report analyzing the competitive landscape.',
+        expected_output='A JSON object containing market analysis insights',
         agent=competitor_analyzer
     )
 
@@ -98,36 +111,39 @@ def create_competitor_analysis_crew(project_title, project_description, idea_des
     return crew
 
 def format_competitor_analysis(result):
-    """Format the competitor analysis results as markdown"""
+    """Format the competitor analysis results as JSON"""
     try:
-        # If the result is already formatted as markdown, return it
-        if isinstance(result, str) and "##" in result:
-            return result
-            
-        # If it's a JSON string, parse it
+        # If the result is already a JSON string, parse it
         if isinstance(result, str):
             try:
                 result = json.loads(result)
             except json.JSONDecodeError:
-                return result
-
-        # Format as markdown
-        markdown_output = "# Competitor Analysis Report\n\n"
-        
-        if isinstance(result, (list, dict)):
-            items = result if isinstance(result, list) else [result]
-            for item in items:
-                if isinstance(item, str):
-                    markdown_output += f"{item}\n\n"
+                # If it's not valid JSON, try to extract JSON-like content
+                import re
+                json_pattern = r'\{[\s\S]*\}'
+                matches = re.findall(json_pattern, result)
+                if matches:
+                    try:
+                        result = json.loads(matches[0])
+                    except json.JSONDecodeError:
+                        # If still not valid JSON, create a basic structure
+                        result = {"raw_response": result}
                 else:
-                    for key, value in item.items():
-                        markdown_output += f"## {key}\n{value}\n\n"
-        else:
-            markdown_output += str(result)
+                    result = {"raw_response": result}
 
-        return markdown_output
+        # Ensure we have a proper dictionary
+        if not isinstance(result, dict):
+            result = {"raw_response": str(result)}
+
+        return {
+            "raw_response": str(result),  # Store original response
+            "structured_data": result if isinstance(result, dict) else {}  # Store structured data
+        }
     except Exception as e:
-        return f"Error formatting analysis: {str(e)}"
+        return {
+            "error": str(e),
+            "raw_response": str(result)
+        }
 
 def generate_competitor_analysis(project):
     """Generate competitor analysis for a project"""
@@ -144,7 +160,19 @@ def generate_competitor_analysis(project):
         result = crew.kickoff()
         print("Analysis complete")
         
-        # Format and return results
-        return format_competitor_analysis(result)
+        # Format results
+        formatted_result = format_competitor_analysis(result)
+        
+        # Update project with results
+        project.ai_response_raw = formatted_result.get("raw_response", "")
+        project.ai_response_json = formatted_result.get("structured_data", {})
+        project.save()
+        
+        return formatted_result
     except Exception as e:
-        return f"Error generating analysis: {str(e)}"
+        error_response = {
+            "error": str(e),
+            "raw_response": None,
+            "structured_data": None
+        }
+        return error_response

@@ -54,8 +54,20 @@ class SignUpForm(UserCreationForm):
         })
 
 class LoginForm(forms.Form):
-    email = forms.EmailField()
-    password = forms.CharField(widget=forms.PasswordInput)
+    email = forms.EmailField(
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control bg-transparent',
+            'placeholder': 'Email',
+            'autocomplete': 'off'
+        })
+    )
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control bg-transparent',
+            'placeholder': 'Password',
+            'autocomplete': 'off'
+        })
+    )
 
 class IdeaForm(forms.ModelForm):
     class Meta:
