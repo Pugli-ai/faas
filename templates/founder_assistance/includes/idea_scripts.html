@@ -1,0 +1,14 @@
+<script>
+function toggleSection(sectionId) {
+    const section = document.getElementById(sectionId);
+    if (section) {
+        $(section).collapse('toggle');
+    }
+}
+
+function confirmDelete(ideaId) {
+    if (confirm('Are you sure you want to delete this idea?')) {
+        document.getElementById('delete-form-' + ideaId).submit();
+    }
+}
+</script>
