@@ -1,0 +1,36 @@
+{% extends 'founder_assistance/base.html' %}
+
+{% block content %}
+<!--begin::Profile-->
+<div class="card">
+    <!--begin::Card header-->
+    <div class="card-header">
+        <h3 class="card-title">Profile Information</h3>
+    </div>
+    <!--end::Card header-->
+
+    <!--begin::Card body-->
+    <div class="card-body">
+        <div class="row mb-6">
+            <label class="col-lg-4 col-form-label fw-semibold fs-6">Username</label>
+            <div class="col-lg-8">
+                <span class="fw-bold fs-6">{{ user.username }}</span>
+            </div>
+        </div>
+        <div class="row mb-6">
+            <label class="col-lg-4 col-form-label fw-semibold fs-6">Email</label>
+            <div class="col-lg-8">
+                <span class="fw-bold fs-6">{{ user.email }}</span>
+            </div>
+        </div>
+        <div class="row mb-6">
+            <label class="col-lg-4 col-form-label fw-semibold fs-6">Date Joined</label>
+            <div class="col-lg-8">
+                <span class="fw-bold fs-6">{{ user.date_joined|date:"F j, Y" }}</span>
+            </div>
+        </div>
+    </div>
+    <!--end::Card body-->
+</div>
+<!--end::Profile-->
+{% endblock %}

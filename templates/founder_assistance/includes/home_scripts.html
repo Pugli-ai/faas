@@ -1,0 +1,163 @@
+{% block extra_css %}
+<style>
+    .card {
+        transition: transform 0.2s;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var monthlyData = {{ monthly_data|default:"[]"|safe }};
+        var weeklyData = {{ weekly_data|default:"[]"|safe }};
+        
+        function initCharts() {
+            // Monthly chart
+            var chart1Element = document.getElementById('kt_chart_widget_1');
+            if (chart1Element) {
+                var chart1 = new ApexCharts(chart1Element, {
+                    series: [{
+                        name: 'Ideas',
+                        data: monthlyData.ideas || []
+                    }, {
+                        name: 'Projects',
+                        data: monthlyData.projects || []
+                    }],
+                    chart: {
+                        type: 'area',
+                        height: 300,
+                        toolbar: {
+                            show: false
+                        }
+                    },
+                    plotOptions: {},
+                    legend: {
+                        show: false
+                    },
+                    dataLabels: {
+                        enabled: false
+                    },
+                    fill: {
+                        type: 'gradient',
+                        gradient: {
+                            shadeIntensity: 1,
+                            opacityFrom: 0.4,
+                            opacityTo: 0.2,
+                            stops: [15, 120, 100]
+                        }
+                    },
+                    stroke: {
+                        curve: 'smooth',
+                        show: true,
+                        width: 3,
+                        colors: ['#20D489', '#1B84FF']
+                    },
+                    xaxis: {
+                        categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                        axisBorder: {
+                            show: false
+                        },
+                        axisTicks: {
+                            show: false
+                        },
+                        labels: {
+                            style: {
+                                colors: '#A1A5B7',
+                                fontSize: '12px'
+                            }
+                        }
+                    },
+                    yaxis: {
+                        labels: {
+                            style: {
+                                colors: '#A1A5B7',
+                                fontSize: '12px'
+                            }
+                        }
+                    },
+                    tooltip: {
+                        theme: 'light'
+                    }
+                });
+                chart1.render();
+            }
+
+            // Weekly chart
+            var chart2Element = document.getElementById('kt_chart_widget_2');
+            if (chart2Element) {
+                var chart2 = new ApexCharts(chart2Element, {
+                    series: [{
+                        name: 'Ideas',
+                        data: weeklyData.ideas || []
+                    }, {
+                        name: 'Projects',
+                        data: weeklyData.projects || []
+                    }],
+                    chart: {
+                        type: 'area',
+                        height: 300,
+                        toolbar: {
+                            show: false
+                        }
+                    },
+                    plotOptions: {},
+                    legend: {
+                        show: false
+                    },
+                    dataLabels: {
+                        enabled: false
+                    },
+                    fill: {
+                        type: 'gradient',
+                        gradient: {
+                            shadeIntensity: 1,
+                            opacityFrom: 0.4,
+                            opacityTo: 0.2,
+                            stops: [15, 120, 100]
+                        }
+                    },
+                    stroke: {
+                        curve: 'smooth',
+                        show: true,
+                        width: 3,
+                        colors: ['#20D489', '#1B84FF']
+                    },
+                    xaxis: {
+                        categories: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                        axisBorder: {
+                            show: false
+                        },
+                        axisTicks: {
+                            show: false
+                        },
+                        labels: {
+                            style: {
+                                colors: '#A1A5B7',
+                                fontSize: '12px'
+                            }
+                        }
+                    },
+                    yaxis: {
+                        labels: {
+                            style: {
+                                colors: '#A1A5B7',
+                                fontSize: '12px'
+                            }
+                        }
+                    },
+                    tooltip: {
+                        theme: 'light'
+                    }
+                });
+                chart2.render();
+            }
+        }
+
+        initCharts();
+    });
+</script>
+{% endblock %}

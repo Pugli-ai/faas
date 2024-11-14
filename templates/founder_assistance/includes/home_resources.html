@@ -1,0 +1,42 @@
+{% if latest_resources %}
+<!--begin::Latest Resources-->
+<div class="card mb-5 mb-xl-10">
+    <!--begin::Card header-->
+    <div class="card-header pt-5">
+        <h3 class="card-title align-items-start flex-column">
+            <span class="card-label fw-bold fs-3 mb-1">Latest Resources</span>
+            <span class="text-gray-500 mt-1 fw-semibold fs-7">Updated resources to help you succeed</span>
+        </h3>
+        <div class="card-toolbar">
+            <a href="{% url 'founder_assistance:resource_list' %}" class="btn btn-sm btn-light">View All</a>
+        </div>
+    </div>
+    <!--end::Card header-->
+
+    <!--begin::Card body-->
+    <div class="card-body py-3">
+        <div class="row g-5 g-xl-10">
+            {% for resource in latest_resources %}
+            <!--begin::Col-->
+            <div class="col-md-4">
+                <!--begin::Resource Card-->
+                <div class="card card-flush h-100">
+                    <div class="card-body p-9">
+                        <div class="fs-2 fw-bold text-dark mb-3">{{ resource.title }}</div>
+                        <div class="fs-6 fw-semibold text-gray-600 mb-5">{{ resource.content|truncatewords:30 }}</div>
+                        <div class="d-flex flex-stack">
+                            <div class="fs-7 fw-semibold text-gray-400">{{ resource.date_published|date:"F j, Y" }}</div>
+                            <a href="{% url 'founder_assistance:resource_detail' resource.id %}" class="btn btn-sm btn-light">Read More</a>
+                        </div>
+                    </div>
+                </div>
+                <!--end::Resource Card-->
+            </div>
+            <!--end::Col-->
+            {% endfor %}
+        </div>
+    </div>
+    <!--end::Card body-->
+</div>
+<!--end::Latest Resources-->
+{% endif %}

@@ -1,0 +1,18 @@
+{% extends 'founder_assistance/base.html' %}
+
+{% block title %}IdeaPools - Empowering Founders{% endblock %}
+
+{% block content %}
+    {% include 'founder_assistance/includes/home_hero.html' %}
+    {% include 'founder_assistance/includes/home_stats.html' %}
+    {% include 'founder_assistance/includes/home_features.html' %}
+    {% include 'founder_assistance/includes/home_resources.html' %}
+{% endblock %}
+
+{% block extra_css %}
+    {% include 'founder_assistance/includes/home_scripts.html' with block_name='extra_css' %}
+{% endblock %}
+
+{% block extra_js %}
+    {% include 'founder_assistance/includes/home_scripts.html' with block_name='extra_js' %}
+{% endblock %}

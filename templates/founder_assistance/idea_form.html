@@ -1,0 +1,132 @@
+{% extends 'founder_assistance/base.html' %}
+
+{% block content %}
+<!--begin::Loading overlay-->
+<div id="loading-overlay" class="position-fixed w-100 h-100 top-0 left-0 d-none" style="background: rgba(0,0,0,0.85); z-index: 99999;">
+    <div class="d-flex align-items-center justify-content-center h-100">
+        <div class="card bg-transparent border-0 text-center">
+            <div class="card-body">
+                <div class="spinner-border text-primary" role="status" style="width: 4rem; height: 4rem;">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <h3 class="text-white mt-4 mb-2">Enhancing Your Idea</h3>
+                <div class="text-white-50 mb-4">Our AI is analyzing and improving your concept</div>
+                <div class="d-flex justify-content-center gap-3">
+                    <div class="bg-opacity-10 bg-white rounded px-3 py-2">
+                        <i class="fas fa-brain text-primary me-2"></i>
+                        <span class="text-white">Refining Concept</span>
+                    </div>
+                    <div class="bg-opacity-10 bg-white rounded px-3 py-2">
+                        <i class="fas fa-chart-line text-primary me-2"></i>
+                        <span class="text-white">Creating Action Plan</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::Loading overlay-->
+
+<!--begin::Content container-->
+<div class="d-flex flex-column flex-column-fluid container-fluid">
+    <!--begin::Content-->
+    <div id="kt_app_content" class="app-content flex-column-fluid">
+        <!--begin::Row-->
+        <div class="row g-5 g-xl-8">
+            <!--begin::Col-->
+            <div class="col-xl-12">
+                <!--begin::Card-->
+                <div class="card mb-5 mb-xl-8">
+                    <!--begin::Card header-->
+                    <div class="card-header border-0 pt-5">
+                        <h3 class="card-title align-items-start flex-column">
+                            <span class="card-label fw-bold fs-3 mb-1">Create New Idea</span>
+                            <span class="text-muted mt-1 fw-semibold fs-7">Share your innovative idea and let AI enhance it</span>
+                        </h3>
+                    </div>
+                    <!--end::Card header-->
+
+                    <!--begin::Card body-->
+                    <div class="card-body py-3">
+                        <form method="post" class="form" id="idea-form">
+                            {% csrf_token %}
+                            
+                            <div class="mb-8">
+                                <label class="required form-label fw-bold">Title</label>
+                                {{ form.title }}
+                                <div class="text-muted fs-7 mt-2">Enter a clear, concise title for your idea</div>
+                                {% if form.title.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.title.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-8">
+                                <label class="required form-label fw-bold">Description</label>
+                                {{ form.description }}
+                                <div class="text-muted fs-7 mt-2">Describe your idea in detail. Include the problem it solves and how it works.</div>
+                                {% if form.description.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.description.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-lg btn-primary" id="submit-btn">
+                                    <span class="indicator-label">
+                                        Submit Idea
+                                    </span>
+                                    <span class="indicator-progress">
+                                        Please wait... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                                    </span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <!--end::Card body-->
+                </div>
+                <!--end::Card-->
+            </div>
+            <!--end::Col-->
+        </div>
+        <!--end::Row-->
+    </div>
+    <!--end::Content-->
+</div>
+<!--end::Content container-->
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('idea-form');
+    const loadingOverlay = document.getElementById('loading-overlay');
+    const submitButton = document.getElementById('submit-btn');
+
+    form.addEventListener('submit', function(e) {
+        // Validate form
+        if (!form.checkValidity()) {
+            return;
+        }
+
+        // Disable submit button and show loading state
+        submitButton.setAttribute('data-kt-indicator', 'on');
+        submitButton.disabled = true;
+
+        // Show loading overlay with fade effect
+        loadingOverlay.style.opacity = '0';
+        loadingOverlay.classList.remove('d-none');
+        loadingOverlay.classList.add('d-flex');
+        
+        // Trigger reflow for transition
+        loadingOverlay.offsetHeight;
+        
+        // Fade in
+        loadingOverlay.style.transition = 'opacity 0.3s ease-in-out';
+        loadingOverlay.style.opacity = '1';
+    });
+});
+</script>
+{% endblock %}
