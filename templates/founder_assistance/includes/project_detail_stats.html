@@ -1,35 +1,21 @@
-<!--begin::Row-->
-<div class="row g-5 g-xl-10 mb-xl-10">
+<!--begin::Stats-->
+<div class="row g-5 g-xl-10">
     <!--begin::Col-->
-    <div class="col-md-6 col-lg-6 col-xl-6 col-xxl-3 mb-md-5 mb-xl-10">
-        <!--begin::Card widget-->
-        <div class="card card-flush h-md-50 mb-5 mb-xl-10">
+    <div class="col-md-6 mb-5">
+        <div class="card card-flush h-lg-100">
             <div class="card-header pt-5">
                 <div class="card-title d-flex flex-column">
-                    <span class="fs-2hx fw-bold text-dark me-2 lh-1 ls-n2">{{ project.get_progress_percentage }}</span>
-                    <span class="text-gray-500 pt-1 fw-semibold fs-6">Project Progress</span>
+                    <span class="fs-2hx fw-bold text-dark me-2 lh-1 ls-n2">{{ project.get_progress_percentage }}%</span>
+                    <span class="text-gray-500 pt-1 fw-semibold fs-6 text-nowrap">Project Progress</span>
                 </div>
             </div>
         </div>
-        <!--end::Card widget-->
-
-        <!--begin::Card widget-->
-        <div class="card card-flush h-md-50 mb-5 mb-xl-10">
-            <div class="card-header pt-5">
-                <div class="card-title d-flex flex-column">
-                    <span class="fs-2hx fw-bold text-dark me-2 lh-1 ls-n2">${{ project.budget }}</span>
-                    <span class="text-gray-500 pt-1 fw-semibold fs-6">Project Budget</span>
-                </div>
-            </div>
-        </div>
-        <!--end::Card widget-->
     </div>
     <!--end::Col-->
 
     <!--begin::Col-->
-    <div class="col-md-6 col-lg-6 col-xl-6 col-xxl-3 mb-md-5 mb-xl-10">
-        <!--begin::Card widget-->
-        <div class="card card-flush h-md-50 mb-5 mb-xl-10">
+    <div class="col-md-6 mb-5">
+        <div class="card card-flush h-lg-100">
             <div class="card-header pt-5">
                 <div class="card-title d-flex flex-column">
                     <div class="d-flex align-items-center">
@@ -38,23 +24,63 @@
                             <i class="fas fa-arrow-up fs-5 text-success ms-n1"></i> 2.2%
                         </span>
                     </div>
-                    <span class="text-gray-500 pt-1 fw-semibold fs-6">Project Earnings</span>
+                    <span class="text-gray-500 pt-1 fw-semibold fs-6 text-nowrap">Project Earnings</span>
                 </div>
             </div>
         </div>
-        <!--end::Card widget-->
+    </div>
+    <!--end::Col-->
 
-        <!--begin::Card widget-->
-        <div class="card card-flush h-md-50 mb-5 mb-xl-10">
+    <!--begin::Col-->
+    <div class="col-md-6 mb-5">
+        <div class="card card-flush h-lg-100">
+            <div class="card-header pt-5">
+                <div class="card-title d-flex flex-column">
+                    <span class="fs-2hx fw-bold text-dark me-2 lh-1 ls-n2">${{ project.budget }}</span>
+                    <span class="text-gray-500 pt-1 fw-semibold fs-6 text-nowrap">Project Budget</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--end::Col-->
+
+    <!--begin::Col-->
+    <div class="col-md-6 mb-5">
+        <div class="card card-flush h-lg-100">
             <div class="card-header pt-5">
                 <div class="card-title d-flex flex-column">
                     <span class="fs-2hx fw-bold text-dark me-2 lh-1 ls-n2">{{ project.team_members.count }}</span>
-                    <span class="text-gray-500 pt-1 fw-semibold fs-6">Team Members</span>
+                    <span class="text-gray-500 pt-1 fw-semibold fs-6 text-nowrap">Team Members</span>
                 </div>
             </div>
         </div>
-        <!--end::Card widget-->
+    </div>
+    <!--end::Col-->
+
+    <!--begin::Col-->
+    <div class="col-md-6">
+        <div class="card card-flush h-lg-100">
+            <div class="card-header pt-5">
+                <div class="card-title d-flex flex-column">
+                    <span class="fs-2hx fw-bold text-dark me-2 lh-1 ls-n2 text-nowrap">{{ project.start_date|date:"M d, Y" }}</span>
+                    <span class="text-gray-500 pt-1 fw-semibold fs-6 text-nowrap">Start Date</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--end::Col-->
+
+    <!--begin::Col-->
+    <div class="col-md-6">
+        <div class="card card-flush h-lg-100">
+            <div class="card-header pt-5">
+                <div class="card-title d-flex flex-column">
+                    <span class="fs-2hx fw-bold text-dark me-2 lh-1 ls-n2 text-nowrap">{{ project.end_date|date:"M d, Y" }}</span>
+                    <span class="text-gray-500 pt-1 fw-semibold fs-6 text-nowrap">End Date</span>
+                </div>
+            </div>
+        </div>
     </div>
     <!--end::Col-->
 </div>
-<!--end::Row-->
+<!--end::Stats-->

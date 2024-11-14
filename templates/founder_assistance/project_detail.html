@@ -6,11 +6,30 @@
 <div id="kt_app_content" class="app-content flex-column-fluid">
     <!--begin::Content container-->
     <div id="kt_app_content_container" class="app-container container-xxl">
-        {% include 'founder_assistance/includes/project_detail_header.html' %}
-        {% include 'founder_assistance/includes/project_detail_stats.html' %}
+        <!--begin::Header-->
+        <div class="mb-10">
+            {% include 'founder_assistance/includes/project_detail_header.html' %}
+        </div>
+        <!--end::Header-->
+        
+        <!--begin::Stats and Upgrade-->
+        <div class="row g-5 g-xl-10">
+            <!--begin::Stats-->
+            <div class="col-xl-7">
+                {% include 'founder_assistance/includes/project_detail_stats.html' %}
+            </div>
+            <!--end::Stats-->
+
+            <!--begin::Upgrade-->
+            <div class="col-xl-5">
+                {% include 'founder_assistance/includes/project_detail_upgrade.html' %}
+            </div>
+            <!--end::Upgrade-->
+        </div>
+        <!--end::Stats and Upgrade-->
 
         <!--begin::Row-->
-        <div class="row g-5 g-xl-10 mb-5 mb-xl-10">
+        <div class="row g-5 g-xl-10 mt-5">
             <!--begin::Col-->
             <div class="col-xxl-6">
                 {% include 'founder_assistance/includes/project_detail_ai_tools.html' %}
@@ -26,7 +45,7 @@
         <!--end::Row-->
 
         <!--begin::Row-->
-        <div class="row g-5 g-xl-10 mb-5 mb-xl-10">
+        <div class="row g-5 g-xl-10 mt-5">
             <!--begin::Col-->
             <div class="col-xxl-6">
                 {% include 'founder_assistance/includes/project_detail_team.html' %}
@@ -43,7 +62,7 @@
 
         {% if project.related_idea %}
         <!--begin::Row-->
-        <div class="row g-5 g-xl-10 mb-5 mb-xl-10">
+        <div class="row g-5 g-xl-10 mt-5">
             <!--begin::Col-->
             <div class="col-xxl-12">
                 {% include 'founder_assistance/includes/project_detail_ai_enhanced.html' %}

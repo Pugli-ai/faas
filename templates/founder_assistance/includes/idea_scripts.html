@@ -13,8 +13,32 @@ function confirmDelete(ideaId) {
     }
 }
 
-// Create idea card HTML
+// Create idea card HTML with enhanced AI content
 function createIdeaCard(idea) {
+    // Parse the description if it's JSON
+    let enhancedContent = '';
+    try {
+        const analysis = JSON.parse(idea.description);
+        if (analysis.analysis && analysis.analysis.refined_idea) {
+            enhancedContent = `
+                <div class="mb-5">
+                    <h4 class="fs-5 text-gray-800 mb-3">Enhanced Description</h4>
+                    <p class="fs-6 text-gray-600">${analysis.analysis.refined_idea.enhanced_description}</p>
+                </div>
+                <div class="mb-5">
+                    <h4 class="fs-5 text-gray-800 mb-3">Unique Selling Proposition</h4>
+                    <p class="fs-6 text-gray-600">${analysis.analysis.refined_idea.unique_selling_proposition}</p>
+                </div>
+                <div class="mb-5">
+                    <h4 class="fs-5 text-gray-800 mb-3">Core Innovation</h4>
+                    <p class="fs-6 text-gray-600">${analysis.analysis.refined_idea.core_innovation}</p>
+                </div>`;
+        }
+    } catch (e) {
+        console.log('Error parsing idea description:', e);
+        enhancedContent = `<p class="fs-6 text-gray-600">${idea.description}</p>`;
+    }
+
     return `
     <div class="card mb-5 mb-xl-8">
         <div class="card-header border-0 pt-5">
@@ -46,7 +70,11 @@ function createIdeaCard(idea) {
         </div>
         <div class="card-body py-3">
             <div class="fs-6 fw-semibold text-gray-600 mb-5">
-                ${idea.description}
+                <h4 class="fs-5 text-gray-800 mb-3">Original Description</h4>
+                <p class="fs-6 text-gray-600 mb-7">${idea.description}</p>
+                <div class="separator separator-dashed my-5"></div>
+                <h4 class="fs-5 text-gray-800 mb-3">AI Enhanced Analysis</h4>
+                ${enhancedContent}
             </div>
         </div>
     </div>`;
@@ -113,6 +141,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
                         // Reset form
                         form.reset();
+
+                        // Show success message
+                        if (data.warning) {
+                            toastr.warning(data.warning);
+                        } else {
+                            toastr.success('Idea created successfully with AI enhancement!');
+                        }
                     }, 300);
                 }, 2000);
             } else {
@@ -131,6 +166,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => {
             console.error('Error:', error);
+            toastr.error('An error occurred while creating the idea');
             // Reset submit button
             submitButton.removeAttribute('data-kt-indicator');
             submitButton.disabled = false;
