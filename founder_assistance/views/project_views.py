@@ -45,8 +45,7 @@ def project_market_analysis(request, project_id):
     
     # Regular page load
     context = {
-        'project': project,
-        'analysis_result': None  # Initially empty, will be populated by AJAX
+        'project': project
     }
     return render(request, 'founder_assistance/project_market_analysis.html', context)
 
@@ -63,15 +62,25 @@ def project_competitor_analysis(request, project_id):
     # Handle AJAX request for analysis generation
     if request.method == "POST" and request.GET.get('generate') == 'true':
         try:
+            # Generate the analysis
             analysis_result = generate_competitor_analysis(project)
-            return JsonResponse({'result': analysis_result})
+            
+            # Print the saved data to terminal
+            print("\nCompetitor Analysis Data Saved to Database:")
+            print("----------------------------------------")
+            print(json.dumps(project.ai_response_json, indent=2))
+            print("----------------------------------------\n")
+            
+            if isinstance(analysis_result, dict) and 'error' in analysis_result:
+                return JsonResponse({'error': analysis_result['error']}, status=500)
+                
+            return JsonResponse({'result': 'success'})
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
     
     # Regular page load
     context = {
-        'project': project,
-        'analysis_result': None  # Initially empty, will be populated by AJAX
+        'project': project
     }
     return render(request, 'founder_assistance/project_competitor_analysis.html', context)
 

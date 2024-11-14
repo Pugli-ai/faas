@@ -281,13 +281,16 @@ function generateAnalysis() {
             'Content-Type': 'application/json',
         },
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
     .then(data => {
-        // Hide loading state
-        document.getElementById('loadingState').classList.add('d-none');
-        document.getElementById('analysisContent').classList.remove('d-none');
-        document.getElementById('generateBtn').disabled = false;
-
+        if (data.error) {
+            throw new Error(data.error);
+        }
         // Reload the page to show new analysis
         window.location.reload();
     })
@@ -297,7 +300,11 @@ function generateAnalysis() {
         document.getElementById('loadingState').classList.add('d-none');
         document.getElementById('analysisContent').classList.remove('d-none');
         document.getElementById('generateBtn').disabled = false;
-        document.getElementById('analysisContent').innerHTML = '<div class="alert alert-danger">Error generating analysis. Please try again.</div>';
+        document.getElementById('analysisContent').innerHTML = `
+            <div class="alert alert-danger">
+                Error generating analysis: ${error.message}
+                Please try again.
+            </div>`;
     });
 }
 </script>

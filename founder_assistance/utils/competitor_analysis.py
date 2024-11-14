@@ -1,5 +1,6 @@
 import os
 import json
+import re
 from crewai import Agent, Task, Crew, Process
 from crewai_tools import SerperDevTool
 from dotenv import load_dotenv
@@ -14,6 +15,28 @@ if not SERPER_API_KEY:
 
 # Initialize the search tool with API key from environment
 search_tool = SerperDevTool()
+
+def extract_json_from_text(text):
+    """Extract valid JSON from text, handling potential markdown or extra text"""
+    # Remove markdown code blocks if present
+    if "```json" in text:
+        text = text.split("```json")[1]
+    if "```" in text:
+        text = text.split("```")[0]
+    
+    # Try to find JSON object in the text
+    json_pattern = r'\{[\s\S]*\}'
+    matches = re.findall(json_pattern, text)
+    
+    if matches:
+        # Try each match until we find valid JSON
+        for match in matches:
+            try:
+                return json.loads(match)
+            except json.JSONDecodeError:
+                continue
+    
+    raise ValueError("No valid JSON found in the text")
 
 def create_competitor_analysis_crew(project_title, project_description, idea_description=None):
     """Create a crew AI system for competitor analysis"""
@@ -47,7 +70,7 @@ def create_competitor_analysis_crew(project_title, project_description, idea_des
     finder_task = Task(
         description=(
             f"Research competitors for: {search_context}\n"
-            "Return the data as a JSON object with the following structure for each competitor and do not include any trailing text:\n"
+            "Return ONLY a JSON object with the following structure for each competitor. Do not include any text before or after the JSON:\n"
             "{\n"
             '  "competitors": [\n'
             "    {\n"
@@ -66,7 +89,7 @@ def create_competitor_analysis_crew(project_title, project_description, idea_des
             "  ]\n"
             "}"
         ),
-        expected_output='A JSON object containing detailed competitor information',
+        expected_output='ONLY the JSON object containing competitor information, with no additional text',
         tools=[search_tool],
         agent=competitor_finder
     )
@@ -74,7 +97,7 @@ def create_competitor_analysis_crew(project_title, project_description, idea_des
     # Create analysis task with JSON structure requirement
     analyzer_task = Task(
         description=(
-            "Analyze the competitor data and provide insights in the following JSON structure:\n"
+            "Analyze the competitor data and provide ONLY a JSON object with the following structure. Do not include any text before or after the JSON:\n"
             "{\n"
             '  "market_overview": {\n'
             '    "key_players": ["Player 1", "Player 2"],\n'
@@ -97,7 +120,7 @@ def create_competitor_analysis_crew(project_title, project_description, idea_des
             "  }\n"
             "}"
         ),
-        expected_output='A JSON object containing market analysis insights',
+        expected_output='ONLY the JSON object containing market analysis insights, with no additional text',
         agent=competitor_analyzer
     )
 
@@ -111,38 +134,46 @@ def create_competitor_analysis_crew(project_title, project_description, idea_des
     return crew
 
 def format_competitor_analysis(result):
-    """Format the competitor analysis results as JSON"""
+    """Format the competitor analysis results as clean JSON"""
     try:
-        # If the result is already a JSON string, parse it
-        if isinstance(result, str):
-            try:
-                result = json.loads(result)
-            except json.JSONDecodeError:
-                # If it's not valid JSON, try to extract JSON-like content
-                import re
-                json_pattern = r'\{[\s\S]*\}'
-                matches = re.findall(json_pattern, result)
-                if matches:
-                    try:
-                        result = json.loads(matches[0])
-                    except json.JSONDecodeError:
-                        # If still not valid JSON, create a basic structure
-                        result = {"raw_response": result}
+        # Store the original result as raw response
+        raw_response = str(result)
+        
+        # If the result is already a dictionary, use it directly
+        if isinstance(result, dict):
+            return raw_response, result
+            
+        # Try to extract and parse JSON from the text
+        try:
+            cleaned_json = extract_json_from_text(result)
+            # Merge competitor data with market analysis if both are present
+            if isinstance(cleaned_json, dict):
+                if 'competitors' in cleaned_json or 'market_overview' in cleaned_json:
+                    return raw_response, cleaned_json
                 else:
-                    result = {"raw_response": result}
-
-        # Ensure we have a proper dictionary
-        if not isinstance(result, dict):
-            result = {"raw_response": str(result)}
-
-        return {
-            "raw_response": str(result),  # Store original response
-            "structured_data": result if isinstance(result, dict) else {}  # Store structured data
-        }
+                    return raw_response, {
+                        "error": "Invalid JSON structure",
+                        "market_overview": {"key_players": [], "market_share": "", "competitive_intensity": ""},
+                        "competitor_strategies": {"business_models": [], "marketing_approaches": [], "technology_stacks": []},
+                        "competitive_advantages": {"differentiators": [], "unique_features": [], "value_propositions": []},
+                        "market_gaps": {"underserved_segments": [], "opportunities": []}
+                    }
+        except ValueError:
+            return raw_response, {
+                "error": "Could not parse valid JSON from response",
+                "market_overview": {"key_players": [], "market_share": "", "competitive_intensity": ""},
+                "competitor_strategies": {"business_models": [], "marketing_approaches": [], "technology_stacks": []},
+                "competitive_advantages": {"differentiators": [], "unique_features": [], "value_propositions": []},
+                "market_gaps": {"underserved_segments": [], "opportunities": []}
+            }
+            
     except Exception as e:
-        return {
+        return str(result), {
             "error": str(e),
-            "raw_response": str(result)
+            "market_overview": {"key_players": [], "market_share": "", "competitive_intensity": ""},
+            "competitor_strategies": {"business_models": [], "marketing_approaches": [], "technology_stacks": []},
+            "competitive_advantages": {"differentiators": [], "unique_features": [], "value_propositions": []},
+            "market_gaps": {"underserved_segments": [], "opportunities": []}
         }
 
 def generate_competitor_analysis(project):
@@ -160,19 +191,25 @@ def generate_competitor_analysis(project):
         result = crew.kickoff()
         print("Analysis complete")
         
-        # Format results
-        formatted_result = format_competitor_analysis(result)
+        # Format results to ensure clean JSON and get both raw and structured responses
+        raw_response, formatted_json = format_competitor_analysis(result)
         
-        # Update project with results
-        project.ai_response_raw = formatted_result.get("raw_response", "")
-        project.ai_response_json = formatted_result.get("structured_data", {})
+        # Store both raw and JSON responses in the database
+        project.ai_response_raw = raw_response
+        project.ai_response_json = formatted_json
         project.save()
         
-        return formatted_result
+        return formatted_json
     except Exception as e:
         error_response = {
             "error": str(e),
-            "raw_response": None,
-            "structured_data": None
+            "market_overview": {"key_players": [], "market_share": "", "competitive_intensity": ""},
+            "competitor_strategies": {"business_models": [], "marketing_approaches": [], "technology_stacks": []},
+            "competitive_advantages": {"differentiators": [], "unique_features": [], "value_propositions": []},
+            "market_gaps": {"underserved_segments": [], "opportunities": []}
         }
+        # Store error state in database
+        project.ai_response_raw = str(e)
+        project.ai_response_json = error_response
+        project.save()
         return error_response
