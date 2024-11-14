@@ -1,0 +1,71 @@
+<!--begin::Team Members-->
+<div class="card card-flush h-md-100">
+    <!--begin::Header-->
+    <div class="card-header pt-7">
+        <h3 class="card-title align-items-start flex-column">
+            <span class="card-label fw-bold text-gray-900">Team Members</span>
+            <span class="text-muted mt-1 fw-semibold fs-7">Project team collaboration</span>
+        </h3>
+        <div class="card-toolbar">
+            <button class="btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#kt_modal_add_member">
+                <i class="fas fa-plus me-2"></i>Add Member
+            </button>
+        </div>
+    </div>
+    <!--end::Header-->
+
+    <!--begin::Body-->
+    <div class="card-body pt-5">
+        <!--begin::Table-->
+        <div class="table-responsive">
+            <table class="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
+                <thead>
+                    <tr class="fw-bold text-muted">
+                        <th class="min-w-150px">Member</th>
+                        <th class="min-w-140px">Role</th>
+                        <th class="min-w-120px">Status</th>
+                        <th class="min-w-100px text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for member in project.team_members.all %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="symbol symbol-45px me-5">
+                                    {% if member.profile_image %}
+                                    <img src="{{ member.profile_image.url }}" alt="">
+                                    {% else %}
+                                    <span class="symbol-label bg-light-primary text-primary fw-bold">{{ member.username|first }}</span>
+                                    {% endif %}
+                                </div>
+                                <div class="d-flex justify-content-start flex-column">
+                                    <span class="text-dark fw-bold text-hover-primary fs-6">{{ member.username }}</span>
+                                    <span class="text-muted fw-semibold text-muted d-block fs-7">{{ member.email }}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="text-muted fw-semibold text-muted d-block fs-7">{{ member.expertise|default:"Team Member" }}</span>
+                        </td>
+                        <td>
+                            <span class="badge badge-light-success">Active</span>
+                        </td>
+                        <td class="text-end">
+                            <button class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1">
+                                <i class="fas fa-envelope"></i>
+                            </button>
+                            <button class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <!--end::Table-->
+    </div>
+    <!--end::Body-->
+</div>
+<!--end::Team Members-->

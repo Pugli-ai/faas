@@ -1,0 +1,31 @@
+<!--begin::Project Header-->
+<div class="card mb-6">
+    <div class="card-body pt-9 pb-0">
+        <!--begin::Details-->
+        <div class="d-flex flex-wrap flex-sm-nowrap">
+            <!--begin::Info-->
+            <div class="flex-grow-1">
+                <!--begin::Title-->
+                <div class="d-flex justify-content-between align-items-start flex-wrap mb-2">
+                    <!--begin::User-->
+                    <div class="d-flex flex-column">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="text-gray-900 fs-2 fw-bold me-1">{{ project.title }}</span>
+                            <span class="badge badge-light-{{ project.get_status_display_class }} fw-bold my-1">{{ project.status|title }}</span>
+                        </div>
+                        <div class="d-flex flex-wrap fw-semibold fs-6 mb-4 pe-2">
+                            <span class="d-flex align-items-center text-gray-500 text-hover-primary me-5 mb-2">
+                                <i class="fas fa-calendar me-1"></i> Started {{ project.start_date|date:"F j, Y" }}
+                            </span>
+                        </div>
+                    </div>
+                    <!--end::User-->
+                </div>
+                <!--end::Title-->
+            </div>
+            <!--end::Info-->
+        </div>
+        <!--end::Details-->
+    </div>
+</div>
+<!--end::Project Header-->

@@ -1,0 +1,130 @@
+{% load idea_filters %}
+
+<!--begin::AI Enhanced Data-->
+<div class="card card-flush h-md-100">
+    <!--begin::Header-->
+    <div class="card-header pt-7">
+        <h3 class="card-title align-items-start flex-column">
+            <span class="card-label fw-bold text-gray-900">AI Enhanced Idea Analysis</span>
+            <span class="text-muted mt-1 fw-semibold fs-7">AI-powered insights from the original idea</span>
+        </h3>
+    </div>
+    <!--end::Header-->
+
+    <!--begin::Body-->
+    <div class="card-body pt-7">
+        <!--begin::Tabs-->
+        <ul class="nav nav-tabs nav-line-tabs mb-5 fs-6">
+            <li class="nav-item">
+                <a class="nav-link active" data-bs-toggle="tab" href="#refined">
+                    <i class="fas fa-star text-warning me-2"></i>Refined Idea
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#market">
+                    <i class="fas fa-chart-line text-info me-2"></i>Market
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#business">
+                    <i class="fas fa-briefcase text-success me-2"></i>Business
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#customer">
+                    <i class="fas fa-users text-primary me-2"></i>Customer
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#strategy">
+                    <i class="fas fa-chess text-danger me-2"></i>Strategy
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#implementation">
+                    <i class="fas fa-tasks text-dark me-2"></i>Implementation
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#financials">
+                    <i class="fas fa-dollar-sign text-success me-2"></i>Financials
+                </a>
+            </li>
+        </ul>
+        <!--end::Tabs-->
+
+        <!--begin::Tab Content-->
+        <div class="tab-content">
+            <!--begin::Refined Idea-->
+            <div class="tab-pane fade show active" id="refined">
+                <div class="bg-light-primary rounded p-4">
+                    <p class="mb-2"><strong>Enhanced Description:</strong> {{ project.related_idea.description|get_json_field:"analysis.refined_idea.enhanced_description" }}</p>
+                    <p class="mb-2"><strong>Unique Selling Proposition:</strong> {{ project.related_idea.description|get_json_field:"analysis.refined_idea.unique_selling_proposition" }}</p>
+                    <p class="mb-0"><strong>Core Innovation:</strong> {{ project.related_idea.description|get_json_field:"analysis.refined_idea.core_innovation" }}</p>
+                </div>
+            </div>
+
+            <!--begin::Market Analysis-->
+            <div class="tab-pane fade" id="market">
+                <div class="bg-light-info rounded p-4">
+                    <p class="mb-2"><strong>Industry Sector:</strong> {{ project.related_idea.description|get_json_field:"analysis.market_analysis.industry_sector" }}</p>
+                    <p class="mb-2"><strong>Market Size:</strong> {{ project.related_idea.description|get_json_field:"analysis.market_analysis.market_size" }}</p>
+                    <p class="mb-2"><strong>Competitive Landscape:</strong> {{ project.related_idea.description|get_json_field:"analysis.market_analysis.competitive_landscape" }}</p>
+                    <p class="mb-0"><strong>Market Trends:</strong><br>{{ project.related_idea.description|get_json_field:"analysis.market_analysis.market_trends"|format_list }}</p>
+                </div>
+            </div>
+
+            <!--begin::Business Framework-->
+            <div class="tab-pane fade" id="business">
+                <div class="bg-light-success rounded p-4">
+                    <p class="mb-2"><strong>Business Model:</strong> {{ project.related_idea.description|get_json_field:"analysis.business_framework.business_model_type" }}</p>
+                    <p class="mb-2"><strong>Revenue Streams:</strong><br>{{ project.related_idea.description|get_json_field:"analysis.business_framework.revenue_streams"|format_list }}</p>
+                    <p class="mb-2"><strong>Key Partnerships:</strong><br>{{ project.related_idea.description|get_json_field:"analysis.business_framework.key_partnerships"|format_list }}</p>
+                    <p class="mb-0"><strong>Distribution Channels:</strong><br>{{ project.related_idea.description|get_json_field:"analysis.business_framework.distribution_channels"|format_list }}</p>
+                </div>
+            </div>
+
+            <!--begin::Target Customer-->
+            <div class="tab-pane fade" id="customer">
+                <div class="bg-light-primary rounded p-4">
+                    <p class="mb-2"><strong>Segments:</strong><br>{{ project.related_idea.description|get_json_field:"analysis.target_customer.segments"|format_list }}</p>
+                    <p class="mb-2"><strong>Demographics:</strong><br>{{ project.related_idea.description|get_json_field:"analysis.target_customer.demographics"|format_dict }}</p>
+                    <p class="mb-0"><strong>Pain Points:</strong><br>{{ project.related_idea.description|get_json_field:"analysis.target_customer.pain_points"|format_list }}</p>
+                </div>
+            </div>
+
+            <!--begin::Strategic Vision-->
+            <div class="tab-pane fade" id="strategy">
+                <div class="bg-light-danger rounded p-4">
+                    <p class="mb-2"><strong>Mission:</strong> {{ project.related_idea.description|get_json_field:"analysis.strategic_vision.mission" }}</p>
+                    <p class="mb-2"><strong>Vision:</strong> {{ project.related_idea.description|get_json_field:"analysis.strategic_vision.vision" }}</p>
+                    <p class="mb-2"><strong>Long Term Goals:</strong><br>{{ project.related_idea.description|get_json_field:"analysis.strategic_vision.long_term_goals"|format_list }}</p>
+                    <p class="mb-0"><strong>Impact:</strong><br>{{ project.related_idea.description|get_json_field:"analysis.strategic_vision.impact"|format_dict }}</p>
+                </div>
+            </div>
+
+            <!--begin::Implementation-->
+            <div class="tab-pane fade" id="implementation">
+                <div class="bg-light-dark rounded p-4">
+                    <p class="mb-2"><strong>Milestones:</strong><br>{{ project.related_idea.description|get_json_field:"analysis.implementation.milestones"|format_list }}</p>
+                    <p class="mb-2"><strong>Resources Needed:</strong><br>{{ project.related_idea.description|get_json_field:"analysis.implementation.resources_needed"|format_list }}</p>
+                    <p class="mb-2"><strong>Risks:</strong><br>{{ project.related_idea.description|get_json_field:"analysis.implementation.risks"|format_list }}</p>
+                    <p class="mb-0"><strong>Success Metrics:</strong><br>{{ project.related_idea.description|get_json_field:"analysis.implementation.success_metrics"|format_list }}</p>
+                </div>
+            </div>
+
+            <!--begin::Financials-->
+            <div class="tab-pane fade" id="financials">
+                <div class="bg-light-success rounded p-4">
+                    <p class="mb-2"><strong>Initial Investment:</strong> {{ project.related_idea.description|get_json_field:"analysis.financials.initial_investment" }}</p>
+                    <p class="mb-2"><strong>Breakeven Timeline:</strong> {{ project.related_idea.description|get_json_field:"analysis.financials.breakeven_timeline" }}</p>
+                    <p class="mb-2"><strong>Potential ROI:</strong> {{ project.related_idea.description|get_json_field:"analysis.financials.potential_roi" }}</p>
+                    <p class="mb-0"><strong>Funding Requirements:</strong> {{ project.related_idea.description|get_json_field:"analysis.financials.funding_requirements" }}</p>
+                </div>
+            </div>
+        </div>
+        <!--end::Tab Content-->
+    </div>
+    <!--end::Body-->
+</div>
+<!--end::AI Enhanced Data-->
