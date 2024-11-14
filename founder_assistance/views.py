@@ -4,6 +4,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import SignUpForm, LoginForm, IdeaForm
 from .models import Idea, Project
+from .utils import augment_idea_with_ai
+import json
 
 def home(request):
     return render(request, 'founder_assistance/home.html')
@@ -37,7 +39,7 @@ def profile_view(request):
 
 @login_required
 def idea_list(request):
-    ideas = Idea.objects.all()
+    ideas = Idea.objects.filter(creator=request.user)
     return render(request, 'founder_assistance/idea_list.html', {'ideas': ideas})
 
 @login_required
@@ -45,9 +47,30 @@ def idea_create(request):
     if request.method == 'POST':
         form = IdeaForm(request.POST)
         if form.is_valid():
+            # Create idea but don't save to DB yet
             idea = form.save(commit=False)
             idea.creator = request.user
-            idea.save()
+            
+            # Get the original title and description
+            title = form.cleaned_data['title']
+            description = form.cleaned_data['description']
+            
+            # Use OpenAI to augment the idea
+            try:
+                augmented_data = augment_idea_with_ai(title, description)
+                # Parse the JSON string back to a dictionary
+                analysis = json.loads(augmented_data)
+                
+                # Update the description with the augmented analysis
+                idea.description = augmented_data
+                idea.save()
+                
+                messages.success(request, 'Idea created successfully with AI-enhanced analysis!')
+            except Exception as e:
+                # If AI augmentation fails, save the original idea
+                idea.save()
+                messages.warning(request, f'Idea saved with original description. AI enhancement failed: {str(e)}')
+            
             return redirect('founder_assistance:idea_list')
     else:
         form = IdeaForm()
@@ -55,7 +78,9 @@ def idea_create(request):
 
 @login_required
 def project_list(request):
-    projects = Project.objects.all()
+    # Filter projects where user is either the creator or a team member
+    projects = Project.objects.filter(creator=request.user) | Project.objects.filter(team_members=request.user)
+    projects = projects.distinct()  # Remove any duplicates
     return render(request, 'founder_assistance/project_list.html', {'projects': projects})
 
 @login_required

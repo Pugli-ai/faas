@@ -23,6 +23,9 @@ DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost'] + os.getenv('ALLOWED_HOSTS', '').split(',')
 
+# OpenAI Configuration
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+
 # Custom User Model
 AUTH_USER_MODEL = 'founder_assistance.User'
 
