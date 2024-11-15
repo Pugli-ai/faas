@@ -1,5 +1,27 @@
 from django.contrib import admin
-from .models import Idea, Project, ProjectTimeline
+from django.contrib.auth.admin import UserAdmin
+from .models import User, Idea, Project, ProjectTimeline
+
+@admin.register(User)
+class CustomUserAdmin(UserAdmin):
+    list_display = ('email', 'username', 'is_staff', 'expertise', 'date_joined')
+    list_filter = ('is_staff', 'is_superuser', 'is_active', 'date_joined')
+    search_fields = ('email', 'username', 'expertise')
+    ordering = ('-date_joined',)
+    
+    fieldsets = (
+        (None, {'fields': ('email', 'password')}),
+        ('Personal info', {'fields': ('username', 'bio', 'expertise', 'profile_image')}),
+        ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
+        ('Important dates', {'fields': ('last_login', 'date_joined')}),
+    )
+    
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('email', 'username', 'password1', 'password2'),
+        }),
+    )
 
 @admin.register(Idea)
 class IdeaAdmin(admin.ModelAdmin):
@@ -29,6 +51,10 @@ class ProjectAdmin(admin.ModelAdmin):
         }),
         ('Relationships', {
             'fields': ('creator', 'team_members', 'related_idea')
+        }),
+        ('AI Analysis', {
+            'fields': ('ai_response_raw', 'ai_response_json'),
+            'classes': ('collapse',)
         }),
     )
 

@@ -17,26 +17,37 @@ if not SERPER_API_KEY:
 search_tool = SerperDevTool()
 
 def extract_json_from_text(text):
-    """Extract valid JSON from text, handling potential markdown or extra text"""
-    # Remove markdown code blocks if present
-    if "```json" in text:
-        text = text.split("```json")[1]
-    if "```" in text:
-        text = text.split("```")[0]
+    """Extract valid JSON from text, handling CrewAI response format"""
+    # Convert CrewOutput to string if needed
+    if hasattr(text, 'raw_output'):
+        text = text.raw_output
+    elif not isinstance(text, str):
+        text = str(text)
     
-    # Try to find JSON object in the text
-    json_pattern = r'\{[\s\S]*\}'
-    matches = re.findall(json_pattern, text)
+    # First try to parse the entire text as JSON
+    try:
+        data = json.loads(text)
+        if isinstance(data, dict) and any(key in data for key in ['market_overview', 'competitors']):
+            return data
+    except json.JSONDecodeError:
+        pass
     
-    if matches:
-        # Try each match until we find valid JSON
-        for match in matches:
-            try:
-                return json.loads(match)
-            except json.JSONDecodeError:
-                continue
+    # If that fails, try to find JSON objects in the text
+    json_pattern = r'\{[\s\S]*?\}'
+    matches = re.finditer(json_pattern, text)
     
-    raise ValueError("No valid JSON found in the text")
+    # Try each match to find valid JSON
+    for match in matches:
+        try:
+            json_str = match.group()
+            data = json.loads(json_str)
+            # Check if this is the analysis JSON we want
+            if isinstance(data, dict) and any(key in data for key in ['market_overview', 'competitors']):
+                return data
+        except json.JSONDecodeError:
+            continue
+    
+    raise ValueError("No valid analysis JSON found in the response")
 
 def create_competitor_analysis_crew(project_title, project_description, idea_description=None):
     """Create a crew AI system for competitor analysis"""
@@ -46,7 +57,7 @@ def create_competitor_analysis_crew(project_title, project_description, idea_des
         role='Competitor Research Specialist',
         goal='Find and analyze direct and indirect competitors in the market',
         verbose=True,
-        model='gpt-4o',
+        model='gpt-4',
         memory=True,
         backstory="An expert in competitive analysis, skilled at identifying and analyzing competitor companies.",
         tools=[search_tool]
@@ -133,49 +144,6 @@ def create_competitor_analysis_crew(project_title, project_description, idea_des
     
     return crew
 
-def format_competitor_analysis(result):
-    """Format the competitor analysis results as clean JSON"""
-    try:
-        # Store the original result as raw response
-        raw_response = str(result)
-        
-        # If the result is already a dictionary, use it directly
-        if isinstance(result, dict):
-            return raw_response, result
-            
-        # Try to extract and parse JSON from the text
-        try:
-            cleaned_json = extract_json_from_text(result)
-            # Merge competitor data with market analysis if both are present
-            if isinstance(cleaned_json, dict):
-                if 'competitors' in cleaned_json or 'market_overview' in cleaned_json:
-                    return raw_response, cleaned_json
-                else:
-                    return raw_response, {
-                        "error": "Invalid JSON structure",
-                        "market_overview": {"key_players": [], "market_share": "", "competitive_intensity": ""},
-                        "competitor_strategies": {"business_models": [], "marketing_approaches": [], "technology_stacks": []},
-                        "competitive_advantages": {"differentiators": [], "unique_features": [], "value_propositions": []},
-                        "market_gaps": {"underserved_segments": [], "opportunities": []}
-                    }
-        except ValueError:
-            return raw_response, {
-                "error": "Could not parse valid JSON from response",
-                "market_overview": {"key_players": [], "market_share": "", "competitive_intensity": ""},
-                "competitor_strategies": {"business_models": [], "marketing_approaches": [], "technology_stacks": []},
-                "competitive_advantages": {"differentiators": [], "unique_features": [], "value_propositions": []},
-                "market_gaps": {"underserved_segments": [], "opportunities": []}
-            }
-            
-    except Exception as e:
-        return str(result), {
-            "error": str(e),
-            "market_overview": {"key_players": [], "market_share": "", "competitive_intensity": ""},
-            "competitor_strategies": {"business_models": [], "marketing_approaches": [], "technology_stacks": []},
-            "competitive_advantages": {"differentiators": [], "unique_features": [], "value_propositions": []},
-            "market_gaps": {"underserved_segments": [], "opportunities": []}
-        }
-
 def generate_competitor_analysis(project):
     """Generate competitor analysis for a project"""
     try:
@@ -187,19 +155,86 @@ def generate_competitor_analysis(project):
         )
         
         # Run the analysis
-        print("Starting competitor analysis...")
+        print("\nStarting competitor analysis...")
         result = crew.kickoff()
-        print("Analysis complete")
+        print("\nAnalysis complete")
         
-        # Format results to ensure clean JSON and get both raw and structured responses
-        raw_response, formatted_json = format_competitor_analysis(result)
+        # Get raw response
+        raw_response = result.raw_output if hasattr(result, 'raw_output') else str(result)
         
-        # Store both raw and JSON responses in the database
-        project.ai_response_raw = raw_response
-        project.ai_response_json = formatted_json
-        project.save()
-        
-        return formatted_json
+        # Extract JSON from the result
+        try:
+            json_data = extract_json_from_text(raw_response)
+            
+            # Store both raw and JSON responses in the database
+            project.ai_response_raw = raw_response
+            project.ai_response_json = json_data
+            project.save()
+            
+            # Print both responses to terminal
+            print("\nRaw Response saved to database:")
+            print("----------------------------------------")
+            print(raw_response)
+            print("----------------------------------------")
+            print("\nJSON Response saved to database:")
+            print("----------------------------------------")
+            print(json.dumps(json_data, indent=2))
+            print("----------------------------------------\n")
+            
+            return json_data
+            
+        except Exception as e:
+            # Try to parse raw response directly if it looks like JSON
+            try:
+                if raw_response.strip().startswith('{') and raw_response.strip().endswith('}'):
+                    json_data = json.loads(raw_response)
+                    if isinstance(json_data, dict) and any(key in json_data for key in ['market_overview', 'competitors']):
+                        # Store both raw and JSON responses in the database
+                        project.ai_response_raw = raw_response
+                        project.ai_response_json = json_data
+                        project.save()
+                        
+                        # Print both responses to terminal
+                        print("\nRaw Response saved to database:")
+                        print("----------------------------------------")
+                        print(raw_response)
+                        print("----------------------------------------")
+                        print("\nJSON Response saved to database:")
+                        print("----------------------------------------")
+                        print(json.dumps(json_data, indent=2))
+                        print("----------------------------------------\n")
+                        
+                        return json_data
+            except:
+                pass
+                
+            # If all parsing attempts fail, store the error and raw response
+            error_response = {
+                "error": str(e),
+                "market_overview": {"key_players": [], "market_share": "", "competitive_intensity": ""},
+                "competitor_strategies": {"business_models": [], "marketing_approaches": [], "technology_stacks": []},
+                "competitive_advantages": {"differentiators": [], "unique_features": [], "value_propositions": []},
+                "market_gaps": {"underserved_segments": [], "opportunities": []}
+            }
+            project.ai_response_raw = raw_response
+            project.ai_response_json = error_response
+            project.save()
+            
+            # Print error state to terminal
+            print("\nError processing response:")
+            print("----------------------------------------")
+            print(f"Error: {str(e)}")
+            print("\nRaw Response saved to database:")
+            print("----------------------------------------")
+            print(raw_response)
+            print("----------------------------------------")
+            print("\nError Response saved to database:")
+            print("----------------------------------------")
+            print(json.dumps(error_response, indent=2))
+            print("----------------------------------------\n")
+            
+            return error_response
+            
     except Exception as e:
         error_response = {
             "error": str(e),
@@ -212,4 +247,15 @@ def generate_competitor_analysis(project):
         project.ai_response_raw = str(e)
         project.ai_response_json = error_response
         project.save()
+        
+        # Print error to terminal
+        print("\nError generating analysis:")
+        print("----------------------------------------")
+        print(f"Error: {str(e)}")
+        print("----------------------------------------")
+        print("\nError Response saved to database:")
+        print("----------------------------------------")
+        print(json.dumps(error_response, indent=2))
+        print("----------------------------------------\n")
+        
         return error_response

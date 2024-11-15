@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
+from django.contrib.auth import get_user_model
 from ..models import Project
 from ..forms import ProjectForm
 from ..utils import generate_market_analysis, generate_competitor_analysis
@@ -24,6 +25,39 @@ def project_detail(request, project_id):
         'ai_insights': get_project_insights(project)
     }
     return render(request, 'founder_assistance/project_detail.html', context)
+
+@login_required
+@require_http_methods(["POST"])
+def add_team_member(request, project_id):
+    project = get_object_or_404(Project, id=project_id)
+    
+    # Check if user has permission to add team members
+    if project.creator != request.user and request.user not in project.team_members.all():
+        messages.error(request, "You don't have permission to add team members to this project.")
+        return redirect('founder_assistance:project_detail', project_id=project_id)
+    
+    email = request.POST.get('email')
+    role = request.POST.get('role')
+    
+    if not email or not role:
+        messages.error(request, "Both email and role are required.")
+        return redirect('founder_assistance:project_detail', project_id=project_id)
+    
+    User = get_user_model()
+    try:
+        user = User.objects.get(email=email)
+        if user == project.creator:
+            messages.error(request, "The project creator is already a team member.")
+        elif user in project.team_members.all():
+            messages.error(request, "This user is already a team member.")
+        else:
+            project.team_members.add(user)
+            # You might want to store the role in a separate model or user profile
+            messages.success(request, f"{user.email} has been added to the project.")
+    except User.DoesNotExist:
+        messages.error(request, "No user found with this email address.")
+    
+    return redirect('founder_assistance:project_detail', project_id=project_id)
 
 @login_required
 @require_http_methods(["GET", "POST"])
