@@ -1,0 +1,196 @@
+{% extends "founder_assistance/base.html" %}
+
+{% block content %}
+<!--begin::Content container-->
+<div class="d-flex flex-column flex-column-fluid container-fluid">
+    <!--begin::Page title-->
+    <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3 pt-4 mb-4">
+        <h1 class="page-heading d-flex text-dark fw-bold fs-3 flex-column justify-content-center my-0">
+            Content Generator
+        </h1>
+        <div class="page-heading d-flex text-dark fw-normal fs-6">
+            <a href="{% url 'founder_assistance:project_detail' project.id %}" class="text-muted text-hover-primary">{{ project.title }}</a>
+            <span class="mx-2">/</span>
+            <span class="text-muted">Content Generator</span>
+        </div>
+    </div>
+    <!--end::Page title-->
+
+    <!--begin::Card-->
+    <div class="card">
+        <!--begin::Card header-->
+        <div class="card-header border-0 pt-6">
+            <h3 class="card-title align-items-start flex-column">
+                <span class="card-label fw-bold fs-3 mb-1">AI Content Generator</span>
+                <span class="text-muted mt-1 fw-semibold fs-7">Generate professional content for your project</span>
+            </h3>
+        </div>
+        <!--end::Card header-->
+
+        <!--begin::Card body-->
+        <div class="card-body py-4">
+            <!--begin::Form-->
+            <form id="content-generator-form" method="post">
+                {% csrf_token %}
+                <!--begin::Input group-->
+                <div class="fv-row mb-8">
+                    <label class="required fs-6 fw-semibold mb-2">Content Type</label>
+                    <select class="form-select" name="content_type" required>
+                        <option value="">Select type...</option>
+                        <option value="email">Marketing Email</option>
+                        <option value="blog">Blog Post</option>
+                        <option value="social">Social Media Post</option>
+                        <option value="marketing">Marketing Copy</option>
+                    </select>
+                </div>
+                <!--end::Input group-->
+
+                <!--begin::Input group-->
+                <div class="fv-row mb-8">
+                    <label class="required fs-6 fw-semibold mb-2">Topic/Purpose</label>
+                    <input type="text" class="form-control" name="topic" placeholder="e.g., Product launch announcement, Monthly newsletter" required />
+                </div>
+                <!--end::Input group-->
+
+                <!--begin::Input group-->
+                <div class="fv-row mb-8">
+                    <label class="required fs-6 fw-semibold mb-2">Key Points</label>
+                    <textarea class="form-control" name="key_points" rows="4" placeholder="Enter the main points you want to cover" required></textarea>
+                </div>
+                <!--end::Input group-->
+
+                <!--begin::Input group-->
+                <div class="fv-row mb-8">
+                    <label class="fs-6 fw-semibold mb-2">Tone</label>
+                    <select class="form-select" name="tone">
+                        <option value="professional">Professional</option>
+                        <option value="casual">Casual</option>
+                        <option value="friendly">Friendly</option>
+                        <option value="formal">Formal</option>
+                        <option value="enthusiastic">Enthusiastic</option>
+                    </select>
+                </div>
+                <!--end::Input group-->
+
+                <!--begin::Actions-->
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary" id="generate-content-btn">
+                        <span class="indicator-label">
+                            Generate Content
+                        </span>
+                        <span class="indicator-progress">
+                            Please wait... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                        </span>
+                    </button>
+                </div>
+                <!--end::Actions-->
+            </form>
+            <!--end::Form-->
+
+            <!--begin::Result-->
+            <div class="mt-8" id="content-result" style="display: none;">
+                <div class="separator separator-dashed my-5"></div>
+                <h3 class="fs-2 fw-bold mb-4">Generated Content</h3>
+                <div class="bg-light rounded p-8">
+                    <pre id="generated-content" class="fs-6" style="white-space: pre-wrap;"></pre>
+                </div>
+                <div class="text-center mt-4">
+                    <button class="btn btn-light-primary" id="copy-content-btn">
+                        <i class="fas fa-copy"></i> Copy Content
+                    </button>
+                </div>
+            </div>
+            <!--end::Result-->
+        </div>
+        <!--end::Card body-->
+    </div>
+    <!--end::Card-->
+</div>
+<!--end::Content container-->
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('content-generator-form');
+    const resultDiv = document.getElementById('content-result');
+    const generatedContent = document.getElementById('generated-content');
+    const copyBtn = document.getElementById('copy-content-btn');
+    const generateBtn = document.getElementById('generate-content-btn');
+
+    // Get CSRF token from cookie
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        // Show loading state
+        generateBtn.setAttribute('data-kt-indicator', 'on');
+        resultDiv.style.display = 'none';
+
+        try {
+            const formData = new FormData(form);
+            const csrftoken = getCookie('csrftoken');
+            
+            // Convert FormData to JSON
+            const jsonData = {};
+            formData.forEach((value, key) => {
+                if (key !== 'csrfmiddlewaretoken') {
+                    jsonData[key] = value;
+                }
+            });
+
+            const response = await fetch(window.location.pathname, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(jsonData),
+                credentials: 'same-origin'
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to generate content');
+            }
+
+            generatedContent.textContent = data.content;
+            resultDiv.style.display = 'block';
+            
+            // Show success message
+            toastr.success('Content generated successfully!');
+        } catch (error) {
+            console.error('Error:', error);
+            toastr.error(error.message || 'Failed to generate content. Please try again.');
+        } finally {
+            generateBtn.removeAttribute('data-kt-indicator');
+        }
+    });
+
+    copyBtn.addEventListener('click', function() {
+        navigator.clipboard.writeText(generatedContent.textContent)
+            .then(() => {
+                toastr.success('Content copied to clipboard!');
+            })
+            .catch(() => {
+                toastr.error('Failed to copy content');
+            });
+    });
+});
+</script>
+{% endblock %}

@@ -1,214 +1,28 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from django.http import JsonResponse
-from django.views.decorators.http import require_http_methods
-from django.contrib.auth import get_user_model
-from ..models import Project
-from ..forms import ProjectForm
-from ..utils import generate_market_analysis, generate_competitor_analysis
-import json
+from .project_base_views import (
+    project_list,
+    project_detail,
+    project_edit
+)
 
-@login_required
-def project_list(request):
-    # Filter projects where user is either the creator or a team member
-    projects = Project.objects.filter(creator=request.user) | Project.objects.filter(team_members=request.user)
-    projects = projects.distinct()  # Remove any duplicates
-    return render(request, 'founder_assistance/project_list.html', {'projects': projects})
+from .project_team_views import (
+    add_team_member,
+    remove_team_member
+)
 
-@login_required
-def project_detail(request, project_id):
-    project = get_object_or_404(Project, id=project_id)
-    context = {
-        'project': project,
-        'stats': get_project_stats(project),
-        'ai_insights': get_project_insights(project)
-    }
-    return render(request, 'founder_assistance/project_detail.html', context)
+from .project_ai_views import (
+    project_content_generator,
+    project_market_analysis,
+    project_competitor_analysis
+)
 
-@login_required
-@require_http_methods(["POST"])
-def add_team_member(request, project_id):
-    project = get_object_or_404(Project, id=project_id)
-    
-    # Check if user has permission to add team members
-    if project.creator != request.user and request.user not in project.team_members.all():
-        messages.error(request, "You don't have permission to add team members to this project.")
-        return redirect('founder_assistance:project_detail', project_id=project_id)
-    
-    email = request.POST.get('email')
-    role = request.POST.get('role')
-    
-    if not email or not role:
-        messages.error(request, "Both email and role are required.")
-        return redirect('founder_assistance:project_detail', project_id=project_id)
-    
-    User = get_user_model()
-    try:
-        user = User.objects.get(email=email)
-        if user == project.creator:
-            messages.error(request, "The project creator is already a team member.")
-        elif user in project.team_members.all():
-            messages.error(request, "This user is already a team member.")
-        else:
-            project.team_members.add(user)
-            # You might want to store the role in a separate model or user profile
-            messages.success(request, f"{user.email} has been added to the project.")
-    except User.DoesNotExist:
-        messages.error(request, "No user found with this email address.")
-    
-    return redirect('founder_assistance:project_detail', project_id=project_id)
-
-@login_required
-@require_http_methods(["GET", "POST"])
-def project_market_analysis(request, project_id):
-    project = get_object_or_404(Project, id=project_id)
-    
-    # Check if user has permission to view
-    if project.creator != request.user and request.user not in project.team_members.all():
-        messages.error(request, "You don't have permission to view this project's market analysis.")
-        return redirect('founder_assistance:project_detail', project_id=project_id)
-    
-    # Handle AJAX request for analysis generation
-    if request.method == "POST" and request.GET.get('generate') == 'true':
-        try:
-            analysis_result = generate_market_analysis(project)
-            return JsonResponse({'result': analysis_result})
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500)
-    
-    # Regular page load
-    context = {
-        'project': project
-    }
-    return render(request, 'founder_assistance/project_market_analysis.html', context)
-
-@login_required
-@require_http_methods(["GET", "POST"])
-def project_competitor_analysis(request, project_id):
-    project = get_object_or_404(Project, id=project_id)
-    
-    # Check if user has permission to view
-    if project.creator != request.user and request.user not in project.team_members.all():
-        messages.error(request, "You don't have permission to view this project's competitor analysis.")
-        return redirect('founder_assistance:project_detail', project_id=project_id)
-    
-    # Handle AJAX request for analysis generation
-    if request.method == "POST" and request.GET.get('generate') == 'true':
-        try:
-            # Generate the analysis
-            analysis_result = generate_competitor_analysis(project)
-            
-            # Print the saved data to terminal
-            print("\nCompetitor Analysis Data Saved to Database:")
-            print("----------------------------------------")
-            print(json.dumps(project.ai_response_json, indent=2))
-            print("----------------------------------------\n")
-            
-            if isinstance(analysis_result, dict) and 'error' in analysis_result:
-                return JsonResponse({'error': analysis_result['error']}, status=500)
-                
-            return JsonResponse({'result': 'success'})
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500)
-    
-    # Regular page load
-    context = {
-        'project': project
-    }
-    return render(request, 'founder_assistance/project_competitor_analysis.html', context)
-
-@login_required
-def project_edit(request, project_id):
-    project = get_object_or_404(Project, id=project_id)
-    
-    # Check if user has permission to edit
-    if project.creator != request.user and request.user not in project.team_members.all():
-        messages.error(request, "You don't have permission to edit this project.")
-        return redirect('founder_assistance:project_detail', project_id=project_id)
-    
-    if request.method == 'POST':
-        form = ProjectForm(request.POST, instance=project)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Project updated successfully.')
-            return redirect('founder_assistance:project_detail', project_id=project_id)
-    else:
-        form = ProjectForm(instance=project)
-    
-    return render(request, 'founder_assistance/project_form.html', {
-        'form': form,
-        'project': project,
-        'is_edit': True
-    })
-
-def get_project_stats(project):
-    """Get project statistics"""
-    return {
-        'active_projects': Project.objects.filter(status='active').count(),
-        'pending_projects': Project.objects.filter(status='pending').count(),
-        'total_professionals': Project.objects.values('team_members').distinct().count(),
-        'project_earnings': project.earnings
-    }
-
-def get_project_insights(project):
-    """Get AI insights from related idea"""
-    if not project.related_idea:
-        return []
-
-    try:
-        idea_analysis = json.loads(project.related_idea.description)
-        market_analysis = idea_analysis.get('analysis', {}).get('market_analysis', {})
-        business_framework = idea_analysis.get('analysis', {}).get('business_framework', {})
-        financials = idea_analysis.get('analysis', {}).get('financials', {})
-        
-        insights = []
-        
-        if market_analysis.get('market_size'):
-            insights.append({
-                'icon': 'lightbulb',
-                'color': 'warning',
-                'title': 'Market Opportunity',
-                'description': f"Market size of {market_analysis.get('market_size')} presents significant growth potential"
-            })
-        
-        if business_framework.get('revenue_streams'):
-            insights.append({
-                'icon': 'chart-pie',
-                'color': 'success',
-                'title': 'Revenue Streams',
-                'description': f"Multiple revenue streams identified: {', '.join(business_framework.get('revenue_streams', []))}"
-            })
-        
-        if financials.get('potential_roi'):
-            insights.append({
-                'icon': 'coins',
-                'color': 'primary',
-                'title': 'Financial Potential',
-                'description': f"Projected ROI: {financials.get('potential_roi')}"
-            })
-            
-        return insights
-        
-    except json.JSONDecodeError:
-        # Default insights if AI analysis can't be parsed
-        return [
-            {
-                'icon': 'lightbulb',
-                'color': 'warning',
-                'title': 'Market Opportunity',
-                'description': 'AI analysis suggests expanding into the European market could increase revenue by 40%'
-            },
-            {
-                'icon': 'chart-pie',
-                'color': 'success',
-                'title': 'Customer Segment',
-                'description': 'Data shows strong product-market fit with millennials in urban areas'
-            },
-            {
-                'icon': 'coins',
-                'color': 'primary',
-                'title': 'Financial Optimization',
-                'description': 'Implementing suggested cost-saving measures could improve margins by 15%'
-            }
-        ]
+# Re-export all views
+__all__ = [
+    'project_list',
+    'project_detail',
+    'project_edit',
+    'add_team_member',
+    'remove_team_member',
+    'project_content_generator',
+    'project_market_analysis',
+    'project_competitor_analysis'
+]

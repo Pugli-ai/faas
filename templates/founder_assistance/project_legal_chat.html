@@ -1,0 +1,199 @@
+{% extends "founder_assistance/base.html" %}
+
+{% block content %}
+<!--begin::Content container-->
+<div class="d-flex flex-column flex-column-fluid container-fluid">
+    <!--begin::Page title-->
+    <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3 pt-4 mb-4">
+        <h1 class="page-heading d-flex text-dark fw-bold fs-3 flex-column justify-content-center my-0">
+            Legal Assistant
+        </h1>
+        <div class="page-heading d-flex text-dark fw-normal fs-6">
+            <a href="{% url 'founder_assistance:project_detail' project.id %}" class="text-muted text-hover-primary">{{ project.title }}</a>
+            <span class="mx-2">/</span>
+            <span class="text-muted">Legal Assistant</span>
+        </div>
+    </div>
+    <!--end::Page title-->
+
+    <!--begin::Card-->
+    <div class="card">
+        <!--begin::Card header-->
+        <div class="card-header border-0 pt-6">
+            <h3 class="card-title align-items-start flex-column">
+                <span class="card-label fw-bold fs-3 mb-1">Legal AI Assistant</span>
+                <span class="text-muted mt-1 fw-semibold fs-7">Get legal assistance and guidance for your project</span>
+            </h3>
+        </div>
+        <!--end::Card header-->
+
+        <!--begin::Card body-->
+        <div class="card-body">
+            <!--begin::Chat-->
+            <div class="d-flex flex-column h-500px">
+                <!--begin::Messages-->
+                <div class="scroll-y me-n5 pe-5 h-400px" id="chat-messages">
+                    <!-- Messages will be inserted here -->
+                </div>
+                <!--end::Messages-->
+
+                <!--begin::Separator-->
+                <div class="separator separator-dashed my-4"></div>
+                <!--end::Separator-->
+
+                <!--begin::Input-->
+                <div class="d-flex align-items-center">
+                    <textarea class="form-control form-control-flush me-3" rows="1" id="chat-input" 
+                              placeholder="Type your legal question here..."></textarea>
+                    <button class="btn btn-primary" id="send-message">
+                        <span class="indicator-label">
+                            Send
+                        </span>
+                        <span class="indicator-progress">
+                            Please wait... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                        </span>
+                    </button>
+                </div>
+                <!--end::Input-->
+            </div>
+            <!--end::Chat-->
+        </div>
+        <!--end::Card body-->
+    </div>
+    <!--end::Card-->
+</div>
+<!--end::Content container-->
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const messagesContainer = document.getElementById('chat-messages');
+    const chatInput = document.getElementById('chat-input');
+    const sendButton = document.getElementById('send-message');
+    let currentThread = null;
+
+    // Get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Add a message to the chat
+    function addMessage(content, isUser = false) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `d-flex ${isUser ? 'justify-content-end mb-4' : 'justify-content-start mb-4'}`;
+        
+        messageDiv.innerHTML = `
+            <div class="d-flex flex-column ${isUser ? 'align-items-end' : 'align-items-start'}">
+                <div class="d-flex align-items-center mb-2">
+                    ${isUser ? `
+                        <div class="me-3">
+                            <span class="text-muted fs-7">You</span>
+                        </div>
+                        <div class="symbol symbol-35px symbol-circle">
+                            <span class="symbol-label bg-light-primary text-primary fs-6 fw-bolder">U</span>
+                        </div>
+                    ` : `
+                        <div class="symbol symbol-35px symbol-circle">
+                            <span class="symbol-label bg-light-info text-info fs-6 fw-bolder">AI</span>
+                        </div>
+                        <div class="ms-3">
+                            <span class="text-muted fs-7">Legal Assistant</span>
+                        </div>
+                    `}
+                </div>
+                <div class="p-5 rounded ${isUser ? 'bg-light-primary' : 'bg-light-info'} text-dark fw-semibold mw-lg-400px">
+                    ${content}
+                </div>
+            </div>
+        `;
+        
+        messagesContainer.appendChild(messageDiv);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    // Send message to backend
+    async function sendMessage(message) {
+        const csrftoken = getCookie('csrftoken');
+        
+        try {
+            const response = await fetch('{% url "founder_assistance:legal_chat" project.id %}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: message,
+                    thread_id: currentThread
+                })
+            });
+
+            const data = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to send message');
+            }
+
+            // Update thread ID if this is the first message
+            if (data.thread_id) {
+                currentThread = data.thread_id;
+            }
+
+            // Add assistant's response
+            if (data.response) {
+                addMessage(data.response, false);
+            }
+
+        } catch (error) {
+            console.error('Error:', error);
+            toastr.error(error.message || 'Failed to send message');
+        }
+    }
+
+    // Handle send button click
+    sendButton.addEventListener('click', async function() {
+        const message = chatInput.value.trim();
+        if (!message) return;
+
+        // Disable input and show loading state
+        chatInput.disabled = true;
+        sendButton.setAttribute('data-kt-indicator', 'on');
+
+        // Add user message to chat
+        addMessage(message, true);
+
+        // Clear input
+        chatInput.value = '';
+
+        try {
+            await sendMessage(message);
+        } finally {
+            // Re-enable input and hide loading state
+            chatInput.disabled = false;
+            sendButton.removeAttribute('data-kt-indicator');
+            chatInput.focus();
+        }
+    });
+
+    // Handle enter key
+    chatInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendButton.click();
+        }
+    });
+});
+</script>
+{% endblock %}
