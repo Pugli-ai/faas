@@ -1,0 +1,126 @@
+{% extends "founder_assistance/startup_guide_base.html" %}
+
+{% block guide_content %}
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h1 class="card-title mb-4">Business Planning</h1>
+
+        <!-- Introduction -->
+        <div class="alert alert-info mb-4">
+            <i class="bi bi-info-circle me-2"></i>
+            A well-structured business plan is your roadmap to success. It helps you clarify your business strategy, identify potential challenges, and outline your path to growth.
+        </div>
+
+        <!-- Executive Summary Section -->
+        <div class="card mb-4">
+            <div class="card-header bg-light">
+                <h3 class="h5 mb-0">1. Executive Summary</h3>
+            </div>
+            <div class="card-body">
+                <p>Your executive summary should capture the essence of your business plan in a concise format.</p>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h4 class="h6 mb-3">Key Components:</h4>
+                                <ul class="list-unstyled mb-0">
+                                    <li><i class="bi bi-check2 text-success me-2"></i>Business concept</li>
+                                    <li><i class="bi bi-check2 text-success me-2"></i>Market opportunity</li>
+                                    <li><i class="bi bi-check2 text-success me-2"></i>Value proposition</li>
+                                    <li><i class="bi bi-check2 text-success me-2"></i>Business model</li>
+                                    <li><i class="bi bi-check2 text-success me-2"></i>Growth strategy</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="alert alert-warning">
+                            <h4 class="h6">Pro Tip:</h4>
+                            <p class="mb-0">Write this section last, after completing all other sections of your business plan.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Implementation Timeline -->
+        <div class="card">
+            <div class="card-header bg-light">
+                <h3 class="h5 mb-0">5. Implementation Timeline</h3>
+            </div>
+            <div class="card-body">
+                <div class="timeline-steps">
+                    <div class="timeline-step">
+                        <div class="timeline-content">
+                            <div class="inner-circle bg-primary"></div>
+                            <p class="h6 mt-3">Phase 1</p>
+                            <p class="mb-0">Setup & Infrastructure</p>
+                        </div>
+                    </div>
+                    <div class="timeline-step">
+                        <div class="timeline-content">
+                            <div class="inner-circle bg-primary"></div>
+                            <p class="h6 mt-3">Phase 2</p>
+                            <p class="mb-0">MVP Development</p>
+                        </div>
+                    </div>
+                    <div class="timeline-step">
+                        <div class="timeline-content">
+                            <div class="inner-circle bg-primary"></div>
+                            <p class="h6 mt-3">Phase 3</p>
+                            <p class="mb-0">Market Launch</p>
+                        </div>
+                    </div>
+                    <div class="timeline-step">
+                        <div class="timeline-content">
+                            <div class="inner-circle bg-primary"></div>
+                            <p class="h6 mt-3">Phase 4</p>
+                            <p class="mb-0">Growth & Scaling</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <a href="{% url 'founder_assistance:startup_guide_legal' %}" class="btn btn-primary">
+                        Continue to Legal & Compliance
+                        <i class="bi bi-arrow-right ms-2"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.timeline-steps {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    margin: 20px 0;
+}
+
+.timeline-steps:before {
+    content: '';
+    position: absolute;
+    height: 2px;
+    width: 100%;
+    background: #e9ecef;
+    top: 20px;
+    z-index: 0;
+}
+
+.timeline-step {
+    z-index: 1;
+    text-align: center;
+    flex: 1;
+}
+
+.inner-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin: 0 auto;
+}
+</style>
+{% endblock %}

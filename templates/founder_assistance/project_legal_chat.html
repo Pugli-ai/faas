@@ -128,7 +128,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const csrftoken = getCookie('csrftoken');
         
         try {
-            const response = await fetch('{% url "founder_assistance:legal_chat" project.id %}', {
+            const response = await fetch('{% url "founder_assistance:project_legal_chat" project.id %}', {
                 method: 'POST',
                 headers: {
                     'X-CSRFToken': csrftoken,
@@ -194,6 +194,13 @@ document.addEventListener('DOMContentLoaded', function() {
             sendButton.click();
         }
     });
+
+    // Load existing messages if any
+    if (chat_messages && chat_messages.length > 0) {
+        chat_messages.forEach(msg => {
+            addMessage(msg.content, msg.role === 'user');
+        });
+    }
 });
 </script>
 {% endblock %}

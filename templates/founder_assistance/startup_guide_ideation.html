@@ -1,0 +1,20 @@
+{% extends "founder_assistance/startup_guide_base.html" %}
+
+{% block guide_content %}
+<!-- Previous content remains the same until the Next Steps section -->
+<div class="card">
+    <div class="card-header bg-light">
+        <h3 class="h5 mb-0">4. Next Steps</h3>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-success mb-4">
+            <h4 class="alert-heading h6">Ready to move forward?</h4>
+            <p class="mb-0">Once you've validated your idea, proceed to the Business Planning section to develop your strategy and execution plan.</p>
+        </div>
+        <a href="{% url 'founder_assistance:startup_guide_business_planning' %}" class="btn btn-primary">
+            Continue to Business Planning
+            <i class="bi bi-arrow-right ms-2"></i>
+        </a>
+    </div>
+</div>
+{% endblock %}

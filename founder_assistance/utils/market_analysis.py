@@ -120,7 +120,42 @@ def format_market_analysis(result):
         print(result)
         print("-------------------\n")
 
-        # If the result is already a JSON string, parse it
+        # If result is already a dict, ensure it has the expected structure
+        if isinstance(result, dict):
+            # Check if it has the expected structure
+            expected_keys = {
+                "market_size_and_growth",
+                "market_segments",
+                "market_trends",
+                "market_challenges"
+            }
+            
+            # If it's missing the expected structure, wrap it
+            if not all(key in result for key in expected_keys):
+                result = {
+                    "market_size_and_growth": {
+                        "current_size": "0",
+                        "growth_projections": "0",
+                        "key_drivers": []
+                    },
+                    "market_segments": {
+                        "segments": [],
+                        "growth_potential": {}
+                    },
+                    "market_trends": {
+                        "current_trends": [],
+                        "emerging_opportunities": []
+                    },
+                    "market_challenges": {
+                        "entry_barriers": [],
+                        "regulatory_challenges": [],
+                        "risks": []
+                    }
+                }
+            
+            return result, json.dumps(result, indent=2)
+
+        # If the result is a string, try to parse it
         if isinstance(result, str):
             try:
                 # Try to extract JSON from markdown code block if present
@@ -132,61 +167,79 @@ def format_market_analysis(result):
                     logger.info("Attempting to parse raw JSON string")
                     parsed_result = json.loads(result)
                 
-                if isinstance(parsed_result, dict):
-                    # Clean up the data structure if needed
-                    if "market_analysis" in parsed_result:
-                        parsed_result = parsed_result["market_analysis"]
-                    
-                    print("\nParsed JSON Result:")
-                    print("-------------------")
-                    print(json.dumps(parsed_result, indent=2))
-                    print("-------------------\n")
-                    
-                    return parsed_result, json.dumps(parsed_result, indent=2)
+                return parsed_result, json.dumps(parsed_result, indent=2)
                 
             except json.JSONDecodeError as e:
                 logger.error(f"JSON decode error: {str(e)}")
-                # If it's not valid JSON, convert the markdown/text to JSON structure
-                sections = {}
-                current_section = None
-                content = []
-                
-                for line in result.split('\n'):
-                    if line.startswith('##'):
-                        if current_section and content:
-                            sections[current_section] = '\n'.join(content).strip()
-                            content = []
-                        current_section = line.replace('#', '').strip()
-                    elif line.strip() and current_section:
-                        content.append(line.strip())
-                
-                if current_section and content:
-                    sections[current_section] = '\n'.join(content).strip()
-                
-                print("\nConverted Markdown to JSON:")
-                print("-------------------------")
-                print(json.dumps(sections, indent=2))
-                print("-------------------------\n")
-                
-                return sections, json.dumps(sections, indent=2)
+                # Return empty structure if parsing fails
+                empty_result = {
+                    "market_size_and_growth": {
+                        "current_size": "0",
+                        "growth_projections": "0",
+                        "key_drivers": []
+                    },
+                    "market_segments": {
+                        "segments": [],
+                        "growth_potential": {}
+                    },
+                    "market_trends": {
+                        "current_trends": [],
+                        "emerging_opportunities": []
+                    },
+                    "market_challenges": {
+                        "entry_barriers": [],
+                        "regulatory_challenges": [],
+                        "risks": []
+                    }
+                }
+                return empty_result, json.dumps(empty_result, indent=2)
 
-        # If it's already a dict, format it as JSON
-        if isinstance(result, dict):
-            return result, json.dumps(result, indent=2)
-
-        # If it's a list, convert to dict and format as JSON
-        if isinstance(result, list):
-            formatted = {"market_analysis": result}
-            return formatted, json.dumps(formatted, indent=2)
-
-        # Fallback for other types
-        formatted = {"market_analysis": str(result)}
-        return formatted, json.dumps(formatted, indent=2)
+        # Fallback for other types - return empty structure
+        empty_result = {
+            "market_size_and_growth": {
+                "current_size": "0",
+                "growth_projections": "0",
+                "key_drivers": []
+            },
+            "market_segments": {
+                "segments": [],
+                "growth_potential": {}
+            },
+            "market_trends": {
+                "current_trends": [],
+                "emerging_opportunities": []
+            },
+            "market_challenges": {
+                "entry_barriers": [],
+                "regulatory_challenges": [],
+                "risks": []
+            }
+        }
+        return empty_result, json.dumps(empty_result, indent=2)
 
     except Exception as e:
         logger.error(f"Error formatting analysis: {str(e)}")
-        error_result = {"error": f"Error formatting analysis: {str(e)}"}
-        return error_result, json.dumps(error_result, indent=2)
+        empty_result = {
+            "market_size_and_growth": {
+                "current_size": "0",
+                "growth_projections": "0",
+                "key_drivers": []
+            },
+            "market_segments": {
+                "segments": [],
+                "growth_potential": {}
+            },
+            "market_trends": {
+                "current_trends": [],
+                "emerging_opportunities": []
+            },
+            "market_challenges": {
+                "entry_barriers": [],
+                "regulatory_challenges": [],
+                "risks": []
+            }
+        }
+        return empty_result, json.dumps(empty_result, indent=2)
 
 def generate_market_analysis(project):
     """Generate market analysis for a project"""

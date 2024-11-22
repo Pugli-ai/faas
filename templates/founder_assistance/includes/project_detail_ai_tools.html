@@ -59,7 +59,7 @@
                         <i class="fas fa-users fs-3x text-danger mb-3"></i>
                         <div class="fs-5 fw-bold text-gray-900">Customer Research</div>
                         <div class="fs-6 text-gray-500">AI-assisted customer insights and analysis</div>
-                        <a href="#" class="btn btn-sm btn-danger mt-3">Research Customers</a>
+                        <a href="{% url 'founder_assistance:project_customer_research' project.id %}" class="btn btn-sm btn-danger mt-3">Research Customers</a>
                     </div>
                 </div>
             </div>
@@ -85,7 +85,7 @@
                         <i class="fas fa-balance-scale fs-3x text-primary mb-3"></i>
                         <div class="fs-5 fw-bold text-gray-900">Legal Assistant</div>
                         <div class="fs-6 text-gray-500">AI guidance on legal and compliance matters</div>
-                        <a href="#" class="btn btn-sm btn-primary mt-3">Get Legal Help</a>
+                        <a href="{% url 'founder_assistance:project_legal_chat' project.id %}" class="btn btn-sm btn-primary mt-3">Get Legal Help</a>
                     </div>
                 </div>
             </div>

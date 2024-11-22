@@ -1,0 +1,58 @@
+{% extends "founder_assistance/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar Navigation -->
+        <div class="col-lg-3 col-md-4 border-end">
+            <div class="position-sticky pt-3">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link {% if active_section == 'overview' %}active{% endif %}" href="{% url 'founder_assistance:startup_guide_overview' %}">
+                            <i class="bi bi-house-door"></i> Overview
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if active_section == 'ideation' %}active{% endif %}" href="{% url 'founder_assistance:startup_guide_ideation' %}">
+                            <i class="bi bi-lightbulb"></i> Ideation & Validation
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if active_section == 'business_planning' %}active{% endif %}" href="{% url 'founder_assistance:startup_guide_business_planning' %}">
+                            <i class="bi bi-file-earmark-text"></i> Business Planning
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if active_section == 'legal' %}active{% endif %}" href="{% url 'founder_assistance:startup_guide_legal' %}">
+                            <i class="bi bi-shield-check"></i> Legal & Compliance
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if active_section == 'funding' %}active{% endif %}" href="{% url 'founder_assistance:startup_guide_funding' %}">
+                            <i class="bi bi-cash-coin"></i> Funding & Finance
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if active_section == 'marketing' %}active{% endif %}" href="{% url 'founder_assistance:startup_guide_marketing' %}">
+                            <i class="bi bi-megaphone"></i> Marketing & Growth
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="col-lg-9 col-md-8">
+            <div class="p-4">
+                {% block guide_content %}
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/custom/startup-guide.js' %}"></script>
+{% endblock %}
