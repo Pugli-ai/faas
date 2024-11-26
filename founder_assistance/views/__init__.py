@@ -1,6 +1,7 @@
 from .auth_views import login_view, signup_view, profile_view
 from .idea_views import idea_list, idea_create, convert_to_project, idea_delete
 from .project_views import project_list, project_detail
+from .project_ai_personas_views import project_user_personas
 from django.shortcuts import render
 from django.db.models import Count
 from django.db.models.functions import ExtractMonth, ExtractWeekDay

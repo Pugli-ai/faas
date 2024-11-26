@@ -20,6 +20,9 @@ from .views.project_ai_chat_views import (
 from .views.project_ai_customer_views import (
     project_customer_research
 )
+from .views.project_ai_personas_views import (
+    project_user_personas
+)
 from .views.startup_guide_views import (
     startup_guide_overview,
     startup_guide_ideation,
@@ -57,6 +60,7 @@ urlpatterns = [
     path('project/<int:project_id>/competitor-analysis/', project_competitor_analysis, name='project_competitor_analysis'),
     path('project/<int:project_id>/legal-chat/', project_legal_chat, name='project_legal_chat'),
     path('project/<int:project_id>/customer-research/', project_customer_research, name='project_customer_research'),
+    path('project/<int:project_id>/user-personas/', project_user_personas, name='project_user_personas'),
     
     # Startup Guide URLs
     path('startup-guide/', startup_guide_overview, name='startup_guide_overview'),

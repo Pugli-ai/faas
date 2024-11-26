@@ -1,0 +1,156 @@
+{% extends 'founder_assistance/base.html' %}
+{% load persona_filters %}
+
+{% block content %}
+<!--begin::Content-->
+<div id="kt_app_content" class="app-content flex-column-fluid">
+    <!--begin::Content container-->
+    <div id="kt_app_content_container" class="app-container container-xxl">
+        <!--begin::Card-->
+        <div class="card">
+            <!--begin::Card header-->
+            <div class="card-header">
+                <h2 class="card-title fw-bold">User Personas</h2>
+                <div class="card-toolbar">
+                    <form method="post" class="me-3">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-magic me-2"></i>Generate Personas
+                        </button>
+                    </form>
+                    <a href="{% url 'founder_assistance:project_detail' project.id %}" class="btn btn-light">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Project
+                    </a>
+                </div>
+            </div>
+            <!--end::Card header-->
+
+            <!--begin::Card body-->
+            <div class="card-body py-10">
+                {% if personas %}
+                    <!--begin::Row-->
+                    <div class="row g-10">
+                        {% for persona in personas %}
+                        <!--begin::Col-->
+                        <div class="col-md-4">
+                            <div class="card shadow-sm h-100">
+                                <!--begin::Header-->
+                                <div class="card-header bg-light py-5">
+                                    <div class="d-flex flex-column align-items-center">
+                                        <div class="symbol symbol-100px symbol-circle mb-5">
+                                            <span class="symbol-label fs-1 fw-bold bg-light-primary text-primary">
+                                                {{ persona.name_age|slice:":1" }}
+                                            </span>
+                                        </div>
+                                        <div class="text-center">
+                                            <h3 class="card-title fw-bold mb-2">{{ persona.name_age }}</h3>
+                                            <div class="fs-6 text-gray-600">{{ persona.background|truncatewords:20 }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--end::Header-->
+
+                                <!--begin::Body-->
+                                <div class="card-body">
+                                    <!--begin::Quote-->
+                                    <div class="bg-light-info rounded p-5 mb-7">
+                                        <i class="fas fa-quote-left text-info fs-2 me-2"></i>
+                                        <span class="fs-6 fw-semibold fst-italic text-gray-800">{{ persona.quote }}</span>
+                                        <i class="fas fa-quote-right text-info fs-2 ms-2"></i>
+                                    </div>
+                                    <!--end::Quote-->
+
+                                    <!--begin::Tech Comfort-->
+                                    <div class="mb-7">
+                                        <h4 class="fs-6 fw-bold mb-3">
+                                            <i class="fas fa-laptop-code text-primary me-2"></i>Tech Comfort Level
+                                        </h4>
+                                        <div class="d-flex align-items-center">
+                                            <div class="flex-grow-1 bg-light rounded h-5px me-2">
+                                                {% if 'High' in persona.tech_comfort %}
+                                                    <div class="bg-primary rounded h-5px" style="width: 90%"></div>
+                                                {% elif 'Medium' in persona.tech_comfort %}
+                                                    <div class="bg-primary rounded h-5px" style="width: 50%"></div>
+                                                {% else %}
+                                                    <div class="bg-primary rounded h-5px" style="width: 20%"></div>
+                                                {% endif %}
+                                            </div>
+                                            <span class="fs-7 fw-semibold text-gray-600 ms-2">{{ persona.tech_comfort }}</span>
+                                        </div>
+                                    </div>
+                                    <!--end::Tech Comfort-->
+
+                                    <!--begin::Goals-->
+                                    <div class="mb-7">
+                                        <h4 class="fs-6 fw-bold mb-3">
+                                            <i class="fas fa-bullseye text-success me-2"></i>Goals & Motivations
+                                        </h4>
+                                        <div class="bg-light rounded p-4">
+                                            <p class="fs-6 text-gray-700 mb-0">{{ persona.goals_motivations }}</p>
+                                        </div>
+                                    </div>
+                                    <!--end::Goals-->
+
+                                    <!--begin::Pain Points-->
+                                    <div class="mb-7">
+                                        <h4 class="fs-6 fw-bold mb-3">
+                                            <i class="fas fa-exclamation-circle text-danger me-2"></i>Pain Points
+                                        </h4>
+                                        <div class="bg-light rounded p-4">
+                                            <p class="fs-6 text-gray-700 mb-0">{{ persona.pain_points }}</p>
+                                        </div>
+                                    </div>
+                                    <!--end::Pain Points-->
+
+                                    <!--begin::Channels-->
+                                    <div class="mb-7">
+                                        <h4 class="fs-6 fw-bold mb-3">
+                                            <i class="fas fa-share-alt text-info me-2"></i>Preferred Channels
+                                        </h4>
+                                        <div class="bg-light rounded p-4">
+                                            <p class="fs-6 text-gray-700 mb-0">{{ persona.preferred_channels }}</p>
+                                        </div>
+                                    </div>
+                                    <!--end::Channels-->
+
+                                    <!--begin::Personality-->
+                                    <div>
+                                        <h4 class="fs-6 fw-bold mb-3">
+                                            <i class="fas fa-user-tag text-warning me-2"></i>Personality Traits
+                                        </h4>
+                                        <div class="d-flex flex-wrap gap-2">
+                                            {% for trait in persona.personality_traits|split:"," %}
+                                                <span class="badge badge-light-primary fs-7 fw-semibold">{{ trait|trim }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    <!--end::Personality-->
+                                </div>
+                                <!--end::Body-->
+                            </div>
+                        </div>
+                        <!--end::Col-->
+                        {% endfor %}
+                    </div>
+                    <!--end::Row-->
+                {% else %}
+                    <!--begin::Empty State-->
+                    <div class="text-center py-10">
+                        <i class="fas fa-user-circle fs-3x text-primary mb-5"></i>
+                        <h3 class="fs-2 fw-bold mb-3">No User Personas Yet</h3>
+                        <p class="text-gray-600 fs-6 mb-5">
+                            Click the "Generate Personas" button above to create detailed user personas 
+                            using AI analysis of your project details.
+                        </p>
+                    </div>
+                    <!--end::Empty State-->
+                {% endif %}
+            </div>
+            <!--end::Card body-->
+        </div>
+        <!--end::Card-->
+    </div>
+    <!--end::Content container-->
+</div>
+<!--end::Content-->
+{% endblock %}
