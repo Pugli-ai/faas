@@ -19,9 +19,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-default-key-change-this')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'False') == 'True'
+DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'faas-442515.uc.r.appspot.com'] + os.getenv('ALLOWED_HOSTS', '').split(',')
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'faas-442515.ew.r.appspot.com'] + os.getenv('ALLOWED_HOSTS', '').split(',')
 
 # OpenAI Configuration
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
@@ -76,15 +76,15 @@ WSGI_APPLICATION = 'ideapools.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 if os.getenv('GAE_APPLICATION', None):
-    # Running on production App Engine, so connect to Google Cloud SQL using
-    # the unix socket at /cloudsql/<your-cloudsql-connection string>
+    # Running on production App Engine, so connect to Google Cloud SQL using TCP
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'HOST': '/cloudsql/faas-442515:us-central1:faas-db',
             'NAME': os.getenv('DB_NAME', 'faas_db'),
             'USER': os.getenv('DB_USER', 'postgres'),
             'PASSWORD': os.getenv('DB_PASSWORD', ''),
+            'HOST': '34.170.178.236',  # Using the IP address from the Cloud SQL instance
+            'PORT': '5432',
         }
     }
 else:
@@ -130,7 +130,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
-STATICFILES_STORAGE = 'whitenoise.storage.StaticFilesStorage'  # Changed from CompressedManifestStaticFilesStorage
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Media files
 MEDIA_URL = '/media/'
@@ -146,10 +146,14 @@ LOGIN_URL = 'founder_assistance:login'
 LOGIN_REDIRECT_URL = 'founder_assistance:home'
 LOGOUT_REDIRECT_URL = 'founder_assistance:home'
 
-# Security settings
-if not DEBUG:
-    SECURE_SSL_REDIRECT = True
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-    SECURE_BROWSER_XSS_FILTER = True
-    SECURE_CONTENT_TYPE_NOSNIFF = True
+# Security settings for production
+SECURE_SSL_REDIRECT = not DEBUG
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_HSTS_SECONDS = 31536000  # 1 year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+
