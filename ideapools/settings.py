@@ -83,8 +83,8 @@ if os.getenv('GAE_APPLICATION', None):
             'NAME': os.getenv('DB_NAME', 'faas_db'),
             'USER': os.getenv('DB_USER', 'postgres'),
             'PASSWORD': os.getenv('DB_PASSWORD', ''),
-            'HOST': '34.170.178.236',  # Using the IP address from the Cloud SQL instance
-            'PORT': '5432',
+            'HOST': os.getenv("DB_HOST", "localhost"),  # Using the IP address from the Cloud SQL instance
+            'PORT': os.getenv("DB_PORT", "5432"),
         }
     }
 else:
@@ -126,11 +126,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',
-]
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATIC_ROOT = BASE_DIR / 'static'
+# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Media files
 MEDIA_URL = '/media/'
