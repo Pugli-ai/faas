@@ -1,9 +1,13 @@
 import os
 import json
 import re
+import logging
 from crewai import Agent, Task, Crew, Process
 from crewai_tools import SerperDevTool
 from dotenv import load_dotenv
+
+# Configure logging
+logger = logging.getLogger(__name__)
 
 # Load environment variables
 load_dotenv()
@@ -155,9 +159,9 @@ def generate_competitor_analysis(project):
         )
         
         # Run the analysis
-        print("\nStarting competitor analysis...")
+        logger.info("Starting competitor analysis for project: %s", project.title)
         result = crew.kickoff()
-        print("\nAnalysis complete")
+        logger.info("Analysis complete for project: %s", project.title)
         
         # Get raw response
         raw_response = result.raw_output if hasattr(result, 'raw_output') else str(result)
@@ -171,16 +175,7 @@ def generate_competitor_analysis(project):
             project.ai_response_json = json_data
             project.save()
             
-            # Print both responses to terminal
-            print("\nRaw Response saved to database:")
-            print("----------------------------------------")
-            print(raw_response)
-            print("----------------------------------------")
-            print("\nJSON Response saved to database:")
-            print("----------------------------------------")
-            print(json.dumps(json_data, indent=2))
-            print("----------------------------------------\n")
-            
+            logger.info("Successfully saved analysis data for project: %s", project.title)
             return json_data
             
         except Exception as e:
@@ -194,68 +189,31 @@ def generate_competitor_analysis(project):
                         project.ai_response_json = json_data
                         project.save()
                         
-                        # Print both responses to terminal
-                        print("\nRaw Response saved to database:")
-                        print("----------------------------------------")
-                        print(raw_response)
-                        print("----------------------------------------")
-                        print("\nJSON Response saved to database:")
-                        print("----------------------------------------")
-                        print(json.dumps(json_data, indent=2))
-                        print("----------------------------------------\n")
-                        
+                        logger.info("Successfully saved analysis data for project: %s (fallback parsing)", project.title)
                         return json_data
             except:
                 pass
                 
-            # If all parsing attempts fail, store the error and raw response
+            # If all parsing attempts fail, return error response
+            logger.error("Failed to parse analysis response for project %s: %s", project.title, str(e))
             error_response = {
-                "error": str(e),
-                "market_overview": {"key_players": [], "market_share": "", "competitive_intensity": ""},
-                "competitor_strategies": {"business_models": [], "marketing_approaches": [], "technology_stacks": []},
-                "competitive_advantages": {"differentiators": [], "unique_features": [], "value_propositions": []},
-                "market_gaps": {"underserved_segments": [], "opportunities": []}
+                "error": "Failed to process market analysis data. Please try again.",
+                "details": str(e)
             }
             project.ai_response_raw = raw_response
             project.ai_response_json = error_response
             project.save()
             
-            # Print error state to terminal
-            print("\nError processing response:")
-            print("----------------------------------------")
-            print(f"Error: {str(e)}")
-            print("\nRaw Response saved to database:")
-            print("----------------------------------------")
-            print(raw_response)
-            print("----------------------------------------")
-            print("\nError Response saved to database:")
-            print("----------------------------------------")
-            print(json.dumps(error_response, indent=2))
-            print("----------------------------------------\n")
-            
             return error_response
             
     except Exception as e:
+        logger.error("Failed to generate analysis for project %s: %s", project.title, str(e))
         error_response = {
-            "error": str(e),
-            "market_overview": {"key_players": [], "market_share": "", "competitive_intensity": ""},
-            "competitor_strategies": {"business_models": [], "marketing_approaches": [], "technology_stacks": []},
-            "competitive_advantages": {"differentiators": [], "unique_features": [], "value_propositions": []},
-            "market_gaps": {"underserved_segments": [], "opportunities": []}
+            "error": "Failed to generate market analysis. Please try again.",
+            "details": str(e)
         }
-        # Store error state in database
         project.ai_response_raw = str(e)
         project.ai_response_json = error_response
         project.save()
-        
-        # Print error to terminal
-        print("\nError generating analysis:")
-        print("----------------------------------------")
-        print(f"Error: {str(e)}")
-        print("----------------------------------------")
-        print("\nError Response saved to database:")
-        print("----------------------------------------")
-        print(json.dumps(error_response, indent=2))
-        print("----------------------------------------\n")
         
         return error_response

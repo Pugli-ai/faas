@@ -2,7 +2,7 @@ from django.urls import path
 from django.contrib.auth.views import LogoutView
 from . import views
 from .views.project_base_views import (
-    project_list, project_detail, project_edit
+    project_list, project_create, project_detail, project_edit
 )
 from .views.project_team_views import (
     add_team_member, remove_team_member
@@ -11,17 +11,16 @@ from .views.project_ai_content_views import (
     project_content_generator
 )
 from .views.project_ai_analysis_views import (
-    project_market_analysis,
     project_competitor_analysis
 )
 from .views.project_ai_chat_views import (
     project_legal_chat
 )
-from .views.project_ai_customer_views import (
-    project_customer_research
-)
 from .views.project_ai_personas_views import (
     project_user_personas
+)
+from .views.project_timeline_views import (
+    add_project_event
 )
 from .views.startup_guide_views import (
     startup_guide_overview,
@@ -47,6 +46,7 @@ urlpatterns = [
     
     # Project URLs
     path('projects/', project_list, name='project_list'),
+    path('projects/create/', project_create, name='project_create'),
     path('project/<int:project_id>/', project_detail, name='project_detail'),
     path('project/<int:project_id>/edit/', project_edit, name='project_edit'),
     
@@ -56,11 +56,12 @@ urlpatterns = [
     
     # Project AI URLs
     path('project/<int:project_id>/generate-content/', project_content_generator, name='project_content_generator'),
-    path('project/<int:project_id>/market-analysis/', project_market_analysis, name='project_market_analysis'),
     path('project/<int:project_id>/competitor-analysis/', project_competitor_analysis, name='project_competitor_analysis'),
     path('project/<int:project_id>/legal-chat/', project_legal_chat, name='project_legal_chat'),
-    path('project/<int:project_id>/customer-research/', project_customer_research, name='project_customer_research'),
     path('project/<int:project_id>/user-personas/', project_user_personas, name='project_user_personas'),
+    
+    # Project Timeline URLs
+    path('project/add-event/', add_project_event, name='add_project_event'),
     
     # Startup Guide URLs
     path('startup-guide/', startup_guide_overview, name='startup_guide_overview'),

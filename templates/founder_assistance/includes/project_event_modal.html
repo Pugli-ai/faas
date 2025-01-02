@@ -1,0 +1,58 @@
+<!--begin::Modal-->
+<div class="modal fade" id="kt_modal_add_event" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form id="kt_modal_add_event_form" class="form">
+                {% csrf_token %}
+                <!--begin::Modal header-->
+                <div class="modal-header">
+                    <h2 class="fw-bold">Add New Event</h2>
+                    <div class="btn btn-icon btn-sm btn-active-icon-primary" data-bs-dismiss="modal">
+                        <i class="ki-duotone ki-cross fs-1">
+                            <span class="path1"></span>
+                            <span class="path2"></span>
+                        </i>
+                    </div>
+                </div>
+                <!--end::Modal header-->
+
+                <!--begin::Modal body-->
+                <div class="modal-body py-10 px-lg-17">
+                    <!--begin::Input group-->
+                    <div class="fv-row mb-8">
+                        <label class="required fs-6 fw-semibold mb-2">Event Title</label>
+                        <input type="text" class="form-control form-control-solid" name="title" required/>
+                    </div>
+                    <!--end::Input group-->
+
+                    <!--begin::Input group-->
+                    <div class="fv-row mb-8">
+                        <label class="fs-6 fw-semibold mb-2">Description</label>
+                        <textarea class="form-control form-control-solid" rows="3" name="description"></textarea>
+                    </div>
+                    <!--end::Input group-->
+
+                    <!--begin::Input group-->
+                    <div class="fv-row mb-8">
+                        <label class="required fs-6 fw-semibold mb-2">Event Date & Time</label>
+                        <input type="datetime-local" class="form-control form-control-solid" name="event_time" required/>
+                    </div>
+                    <!--end::Input group-->
+                </div>
+                <!--end::Modal body-->
+
+                <!--begin::Modal footer-->
+                <div class="modal-footer flex-center">
+                    <button type="reset" class="btn btn-light me-3" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <span class="indicator-label">Submit</span>
+                        <span class="indicator-progress">Please wait...
+                        <span class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
+                    </button>
+                </div>
+                <!--end::Modal footer-->
+            </form>
+        </div>
+    </div>
+</div>
+<!--end::Modal-->

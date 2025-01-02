@@ -14,61 +14,69 @@ logger = logging.getLogger(__name__)
 # Initialize OpenAI client with error handling
 try:
     if not settings.OPENAI_API_KEY:
-        print("[WARNING] OpenAI API key is not set in settings")
         logger.warning("OpenAI API key is not configured in settings")
         client = None
     else:
         client = OpenAI(api_key=settings.OPENAI_API_KEY)
-        print("[INFO] OpenAI client configured successfully")
 except Exception as e:
-    print(f"[ERROR] Failed to initialize OpenAI client: {str(e)}")
     logger.error(f"Failed to initialize OpenAI client: {str(e)}")
     client = None
+
+def get_project_context(project):
+    """Generate a rich context from project details"""
+    context = f"Project: {project.title}\nDescription: {project.description}\n"
+    
+    if project.related_idea:
+        context += f"\nCore Idea: {project.related_idea.description}"
+    
+    if project.ai_response_json:
+        try:
+            market_data = json.loads(project.ai_response_json)
+            if 'market_overview' in market_data:
+                overview = market_data['market_overview']
+                context += "\n\nMarket Context:"
+                if 'key_players' in overview:
+                    context += f"\nKey Competitors: {', '.join(overview['key_players'])}"
+                if 'competitive_intensity' in overview:
+                    context += f"\nMarket Competition: {overview['competitive_intensity']}"
+            if 'market_gaps' in market_data:
+                gaps = market_data['market_gaps']
+                if 'opportunities' in gaps:
+                    context += f"\nMarket Opportunities: {', '.join(gaps['opportunities'])}"
+        except:
+            pass
+    
+    return context
 
 @login_required
 def project_content_generator(request, project_id):
     """Handle content generation requests"""
-    print(f"\n[DEBUG] Content Generator View - Method: {request.method}")
-    print(f"[DEBUG] Project ID: {project_id}")
-    
     try:
         project = get_object_or_404(Project, id=project_id)
         
         # Check if user has permission to view
         if project.creator != request.user and request.user not in project.team_members.all():
-            print("[ERROR] Permission denied for user")
             return JsonResponse({
                 'error': "You don't have permission to access this project's content generator."
             }, status=403)
         
         # Handle AJAX request for content generation
         if request.method == "POST":
-            print("[DEBUG] Processing POST request")
-            
             # Verify OpenAI client is initialized
             if not client:
-                print("[ERROR] OpenAI client is not configured")
                 return JsonResponse({
-                    'error': 'OpenAI API key is not configured. Please check your environment variables.'
+                    'error': 'OpenAI API key is not configured. Please contact support.'
                 }, status=500)
             
             try:
                 # Parse request body
-                body = request.body.decode('utf-8')
-                print(f"[DEBUG] Raw request body: {body}")
-                data = json.loads(body)
+                data = json.loads(request.body.decode('utf-8'))
                 
                 # Extract and validate fields
                 content_type = data.get('content_type', '')
                 topic = data.get('topic', '')
                 key_points = data.get('key_points', '')
                 tone = data.get('tone', 'professional')
-                
-                print(f"[DEBUG] Parsed data:")
-                print(f"- Content Type: {content_type}")
-                print(f"- Topic: {topic}")
-                print(f"- Tone: {tone}")
-                print(f"- Key Points: {key_points}")
                 
                 # Validate required fields
                 if not all([content_type, topic, key_points]):
@@ -77,18 +85,23 @@ def project_content_generator(request, project_id):
                     if not topic: missing_fields.append('topic')
                     if not key_points: missing_fields.append('key_points')
                     
-                    print(f"[ERROR] Missing required fields: {', '.join(missing_fields)}")
                     return JsonResponse({
                         'error': f"Missing required fields: {', '.join(missing_fields)}"
                     }, status=400)
                 
-                # Construct system message based on content type
-                system_message = {
-                    'email': "You are an expert email copywriter who creates compelling business emails.",
-                    'blog': "You are a professional blog writer who creates engaging and SEO-optimized content.",
-                    'social': "You are a social media expert who creates viral and engaging posts.",
-                    'marketing': "You are a marketing copywriter who creates persuasive content that drives conversions."
-                }.get(content_type, "You are a professional content creator skilled in writing compelling business content.")
+                # Get project context
+                project_context = get_project_context(project)
+                
+                # Construct system message based on content type and project context
+                system_message = f"""You are a specialized content creator for a startup project with the following context:
+
+{project_context}
+
+Your role is to create {content_type} content that specifically addresses this project's unique aspects, market position, and target audience. Focus on:
+1. The project's specific value propositions
+2. Its market differentiation
+3. Addressing identified market gaps
+4. Speaking directly to the target audience's needs"""
                 
                 # Construct user message with specific instructions
                 format_instructions = {
@@ -98,44 +111,40 @@ def project_content_generator(request, project_id):
                     'marketing': "Format this as persuasive marketing copy that highlights benefits, addresses pain points, and includes a strong call-to-action."
                 }.get(content_type, "")
                 
-                user_message = f"""Create a {tone} {content_type} about {topic}.
+                user_message = f"""Create a {tone} {content_type} about {topic} that aligns with our project's goals and market position.
 
 Key points to include:
 {key_points}
 
 {format_instructions}
 
-Additional requirements:
+Requirements:
 - Maintain a {tone} tone throughout
+- Reference our project's unique value propositions
+- Address specific market gaps and opportunities identified
+- Focus on our target audience's needs
 - Use clear and concise language
-- Include relevant keywords naturally
-- Ensure content is engaging and valuable to the target audience"""
-                
-                print(f"[DEBUG] Calling OpenAI API...")
+- Ensure content is engaging and valuable"""
                 
                 try:
                     # Call OpenAI API with GPT-4
                     response = client.chat.completions.create(
-                        model="gpt-4-1106-preview",  # Using the latest GPT-4 Turbo
+                        model="gpt-4-1106-preview",
                         messages=[
                             {"role": "system", "content": system_message},
                             {"role": "user", "content": user_message}
                         ],
-                        temperature=0.7,  # Balanced creativity and consistency
-                        max_tokens=2000,  # Adjust based on content type
+                        temperature=0.7,
+                        max_tokens=2000,
                         top_p=0.9,
-                        frequency_penalty=0.3,  # Reduce repetition
-                        presence_penalty=0.3    # Encourage diverse content
+                        frequency_penalty=0.3,
+                        presence_penalty=0.3
                     )
                     
-                    print("[DEBUG] OpenAI API call successful")
                     generated_content = response.choices[0].message.content.strip()
-                    print(f"[DEBUG] Generated content length: {len(generated_content)}")
-                    
                     return JsonResponse({'content': generated_content})
                     
                 except Exception as e:
-                    print(f"[ERROR] OpenAI API Error: {str(e)}")
                     logger.error(f"OpenAI API Error: {str(e)}")
                     logger.error(traceback.format_exc())
                     return JsonResponse({
@@ -144,7 +153,6 @@ Additional requirements:
                     }, status=500)
                 
             except json.JSONDecodeError as e:
-                print(f"[ERROR] JSON Decode Error: {str(e)}")
                 logger.error(f"JSON Decode Error: {str(e)}")
                 return JsonResponse({
                     'error': 'Invalid request format',
@@ -152,7 +160,6 @@ Additional requirements:
                 }, status=400)
                 
             except Exception as e:
-                print(f"[ERROR] Unexpected Error: {str(e)}")
                 logger.error(f"Unexpected Error: {str(e)}")
                 logger.error(traceback.format_exc())
                 return JsonResponse({
@@ -161,13 +168,11 @@ Additional requirements:
                 }, status=500)
         
         # Regular page load
-        print("[DEBUG] Regular page load - rendering template")
         return render(request, 'founder_assistance/project_content_generator.html', {
             'project': project
         })
         
     except Exception as e:
-        print(f"[ERROR] View-level Exception: {str(e)}")
         logger.error(f"View-level Exception: {str(e)}")
         logger.error(traceback.format_exc())
         if request.method == "POST":

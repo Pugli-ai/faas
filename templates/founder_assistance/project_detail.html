@@ -36,11 +36,6 @@
             </div>
             <!--end::Col-->
 
-            <!--begin::Col-->
-            <div class="col-xxl-6">
-                {% include 'founder_assistance/includes/project_detail_timeline.html' %}
-            </div>
-            <!--end::Col-->
         </div>
         <!--end::Row-->
 
@@ -55,6 +50,16 @@
             <!--begin::Col-->
             <div class="col-xxl-6">
                 {% include 'founder_assistance/includes/project_detail_insights.html' %}
+            </div>
+            <!--end::Col-->
+        </div>
+        <!--end::Row-->
+
+        <!--begin::Row-->
+        <div class="row g-5 g-xl-10 mt-5">
+            <!--begin::Col-->
+            <div class="col-xxl-12">
+                {% include 'founder_assistance/includes/project_detail_timeline.html' %}
             </div>
             <!--end::Col-->
         </div>
@@ -79,6 +84,49 @@
 
 {% block extra_js %}
 <script>
-// Add any custom JavaScript needed for the project detail page
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('kt_modal_add_event_form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const submitButton = form.querySelector('[type="submit"]');
+            submitButton.setAttribute('data-kt-indicator', 'on');
+            submitButton.disabled = true;
+
+            const formData = new FormData(form);
+            formData.append('project_id', '{{ project.id }}');
+
+            fetch('{% url "founder_assistance:add_project_event" %}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Close modal and refresh page to show new event
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('kt_modal_add_event'));
+                    modal.hide();
+                    window.location.reload();
+                } else {
+                    alert('Error adding event: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error adding event. Please try again.');
+            })
+            .finally(() => {
+                submitButton.removeAttribute('data-kt-indicator');
+                submitButton.disabled = false;
+            });
+        });
+    }
+});
 </script>
+
+{% include 'founder_assistance/includes/project_event_modal.html' %}
 {% endblock %}

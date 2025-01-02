@@ -14,12 +14,15 @@ from .project_ai_content_views import (
 )
 
 from .project_ai_analysis_views import (
-    project_market_analysis,
     project_competitor_analysis
 )
 
 from .project_ai_chat_views import (
     project_legal_chat
+)
+
+from .project_timeline_views import (
+    add_project_event
 )
 
 # Re-export all views
@@ -30,7 +33,7 @@ __all__ = [
     'add_team_member',
     'remove_team_member',
     'project_content_generator',
-    'project_market_analysis',
     'project_competitor_analysis',
-    'project_legal_chat'
+    'project_legal_chat',
+    'add_project_event'
 ]
