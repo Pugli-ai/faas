@@ -13,6 +13,9 @@ from .views.project_ai_content_views import (
 from .views.project_ai_analysis_views import (
     project_competitor_analysis
 )
+from .views.project_ai_market_analysis_views import (
+    project_market_analysis
+)
 from .views.project_ai_chat_views import (
     project_legal_chat
 )
@@ -57,6 +60,7 @@ urlpatterns = [
     # Project AI URLs
     path('project/<int:project_id>/generate-content/', project_content_generator, name='project_content_generator'),
     path('project/<int:project_id>/competitor-analysis/', project_competitor_analysis, name='project_competitor_analysis'),
+    path('project/<int:project_id>/market-analysis/', project_market_analysis, name='project_market_analysis'),
     path('project/<int:project_id>/legal-chat/', project_legal_chat, name='project_legal_chat'),
     path('project/<int:project_id>/user-personas/', project_user_personas, name='project_user_personas'),
     
