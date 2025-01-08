@@ -6,6 +6,25 @@ from ..forms import ProjectForm
 from .project_helpers import get_project_stats, get_project_insights
 
 @login_required
+def project_create(request):
+    """Create a new project"""
+    if request.method == 'POST':
+        form = ProjectForm(request.POST)
+        if form.is_valid():
+            project = form.save(commit=False)
+            project.creator = request.user
+            project.save()
+            messages.success(request, 'Project created successfully.')
+            return redirect('founder_assistance:project_detail', project_id=project.id)
+    else:
+        form = ProjectForm()
+    
+    return render(request, 'founder_assistance/project_form.html', {
+        'form': form,
+        'is_edit': False
+    })
+
+@login_required
 def project_list(request):
     """List all projects where user is either creator or team member"""
     projects = Project.objects.filter(creator=request.user) | Project.objects.filter(team_members=request.user)
