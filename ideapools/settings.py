@@ -21,7 +21,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-default-key-change-this')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'faas-442515.ew.r.appspot.com'] + os.getenv('ALLOWED_HOSTS', '').split(',')
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'faas-442515.ew.r.appspot.com', 'https://ideapools.livelygrass-ca7503d5.francecentral.azurecontainerapps.io'] + os.getenv('ALLOWED_HOSTS', '').split(',')
 
 # OpenAI Configuration
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
