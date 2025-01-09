@@ -1,17 +1,19 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - IdeaPools</title>
+    <title>Login - FaaS</title>
     
     <!--begin::Fonts(mandatory for all pages)-->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <!--end::Fonts-->
 
     <!--begin::Global Stylesheets Bundle(mandatory for all pages)-->
-    <link href="/static/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
-    <link href="/static/css/style.bundle.css" rel="stylesheet" type="text/css" />
+    <link href="{% static 'plugins/global/plugins.bundle.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'css/style.bundle.css' %}" rel="stylesheet" type="text/css" />
     <!--end::Global Stylesheets Bundle-->
 </head>
 <body id="kt_body" class="app-blank">
@@ -53,7 +55,7 @@
                             <!--begin::Heading-->
                             <div class="text-center mb-11">
                                 <h1 class="text-dark fw-bolder mb-3">Sign In</h1>
-                                <div class="text-gray-500 fw-semibold fs-6">Welcome back to IdeaPools</div>
+                                <div class="text-gray-500 fw-semibold fs-6">Welcome back to FaaS</div>
                             </div>
                             <!--end::Heading-->
 
@@ -68,13 +70,23 @@
 
                             <!--begin::Input group-->
                             <div class="fv-row mb-8">
-                                <input type="email" placeholder="Email" name="email" autocomplete="off" class="form-control bg-transparent" required />
+                                <div class="position-relative">
+                                    <span class="position-absolute top-50 translate-middle-y ms-3">
+                                        <i class="fas fa-envelope text-gray-500 fs-6"></i>
+                                    </span>
+                                    <input type="email" placeholder="Email" name="email" autocomplete="off" class="form-control bg-transparent ps-10" required />
+                                </div>
                             </div>
                             <!--end::Input group-->
 
                             <!--begin::Input group-->
                             <div class="fv-row mb-8">
-                                <input type="password" placeholder="Password" name="password" autocomplete="off" class="form-control bg-transparent" required />
+                                <div class="position-relative">
+                                    <span class="position-absolute top-50 translate-middle-y ms-3">
+                                        <i class="fas fa-lock text-gray-500 fs-6"></i>
+                                    </span>
+                                    <input type="password" placeholder="Password" name="password" autocomplete="off" class="form-control bg-transparent ps-10" required />
+                                </div>
                             </div>
                             <!--end::Input group-->
 
@@ -102,28 +114,32 @@
             <!--end::Body-->
 
             <!--begin::Aside-->
-            <div class="d-flex flex-lg-row-fluid w-lg-50 bgi-size-cover bgi-position-center order-1 order-lg-2" style="background-image: url(/static/media/auth/bg11.png)">
+            <div class="d-flex flex-lg-row-fluid w-lg-50 bgi-size-cover bgi-position-center order-1 order-lg-2" style="background-image: url({% static 'media/auth/bg4.jpg' %})">
                 <!--begin::Content-->
                 <div class="d-flex flex-column flex-center py-7 py-lg-15 px-5 px-md-15 w-100">
                     <!--begin::Logo-->
                     <a href="{% url 'founder_assistance:home' %}" class="mb-12">
                         <i class="fas fa-lightbulb fs-1 text-white"></i>
-                        <span class="fs-1 fw-bold text-white ms-2">IdeaPools</span>
+                        <span class="fs-1 fw-bold text-white ms-2">Faas</span>
                     </a>
                     <!--end::Logo-->
 
                     <!--begin::Title-->
                     <h1 class="text-white fs-2qx fw-bolder text-center mb-7">
-                        Transform Your Ideas Into Reality
+                        Welcome Back Innovator
                     </h1>
                     <!--end::Title-->
 
                     <!--begin::Text-->
                     <div class="text-white fs-base text-center">
-                        Join our platform to turn your innovative ideas into successful projects. 
-                        Access powerful tools, resources, and a supportive community.
+                        Continue your journey of innovation and entrepreneurship.<br/>
+                        Access your projects, tools, and connect with our community.
                     </div>
                     <!--end::Text-->
+
+                    <!--begin::Image-->
+                    <img src="{% static 'media/auth/agency.png' %}" class="d-none d-lg-block mx-auto w-275px w-md-50 w-xl-500px mb-10 mb-lg-20" />
+                    <!--end::Image-->
                 </div>
                 <!--end::Content-->
             </div>
@@ -134,8 +150,8 @@
     <!--end::Root-->
 
     <!--begin::Javascript-->
-    <script src="/static/plugins/global/plugins.bundle.js"></script>
-    <script src="/static/js/scripts.bundle.js"></script>
+    <script src="{% static 'plugins/global/plugins.bundle.js' %}"></script>
+    <script src="{% static 'js/scripts.bundle.js' %}"></script>
     <!--end::Javascript-->
 </body>
 </html>
