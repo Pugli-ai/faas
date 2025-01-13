@@ -1,0 +1,66 @@
+/* Custom menu alignment */
+.menu.menu-column {
+    padding: 0 0.5rem !important;
+}
+
+.menu-item .menu-link {
+    padding: 0.65rem 1rem !important;
+    margin: 0 0.5rem;
+    border-radius: 0.475rem;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.menu-sub-accordion {
+    padding: 0 0.5rem 0 1.25rem !important;
+}
+
+/* Adjust icon spacing */
+.menu-icon {
+    margin-right: 0.75rem !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 30px !important;
+    flex-shrink: 0;
+}
+
+/* Ensure content is properly spaced */
+.menu-title {
+    flex-grow: 1;
+    text-align: left;
+}
+
+.menu-arrow {
+    margin-left: 0.5rem !important;
+    flex-shrink: 0;
+}
+
+/* Adjust heading alignment */
+.menu-content {
+    padding: 0 1rem !important;
+}
+
+/* Improve submenu items */
+.menu-sub .menu-item .menu-link {
+    padding-left: 1.75rem !important;
+}
+
+/* Active state enhancement */
+.menu-item .menu-link.active {
+    background-color: var(--kt-primary-light) !important;
+}
+
+/* Fix menu item layout */
+.menu-item {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Ensure proper text wrapping */
+.menu-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
