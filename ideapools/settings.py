@@ -185,12 +185,13 @@ LOGIN_REDIRECT_URL = 'founder_assistance:home'
 LOGOUT_REDIRECT_URL = 'founder_assistance:home'
 
 # Security settings for production
-SECURE_SSL_REDIRECT = not DEBUG
-SESSION_COOKIE_SECURE = not DEBUG
-CSRF_COOKIE_SECURE = not DEBUG
-SECURE_BROWSER_XSS_FILTER = True
-SECURE_CONTENT_TYPE_NOSNIFF = True
+is_production = bool(os.getenv('GAE_APPLICATION', None))
+SECURE_SSL_REDIRECT = is_production
+SESSION_COOKIE_SECURE = is_production
+CSRF_COOKIE_SECURE = is_production
+SECURE_BROWSER_XSS_FILTER = is_production
+SECURE_CONTENT_TYPE_NOSNIFF = is_production
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-SECURE_HSTS_SECONDS = 31536000  # 1 year
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_HSTS_PRELOAD = True
+SECURE_HSTS_SECONDS = 31536000 if is_production else 0  # 1 year in production
+SECURE_HSTS_INCLUDE_SUBDOMAINS = is_production
+SECURE_HSTS_PRELOAD = is_production
