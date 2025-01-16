@@ -15,3 +15,5 @@ def profile_view(request):
 @login_required
 def resources(request):
     return render(request, 'founder_assistance/resources.html')
+
+#emptycommit
