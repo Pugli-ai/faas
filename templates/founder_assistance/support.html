@@ -1,0 +1,74 @@
+{% extends "founder_assistance/base.html" %}
+
+{% block content %}
+<!--begin::Content-->
+<div class="app-content flex-column-fluid">
+    <!--begin::Container-->
+    <div class="app-container container-xxl">
+        <!--begin::Card-->
+        <div class="card">
+            <!--begin::Card body-->
+            <div class="card-body p-lg-15">
+                <!--begin::Section-->
+                <div class="mb-15">
+                    <!--begin::Title-->
+                    <h1 class="fs-2x text-dark mb-6">Support Center</h1>
+                    <!--end::Title-->
+
+                    <!--begin::Text-->
+                    <div class="fs-5 text-gray-600">
+                        <div class="mb-10">
+                            <h3 class="fs-2 text-dark mb-4">Frequently Asked Questions</h3>
+                            
+                            <div class="mb-4">
+                                <h4 class="fs-4 text-dark mb-3">How do I get started with Faas?</h4>
+                                <p>Simply sign up for an account and follow our guided onboarding process. You'll be able to start creating projects and accessing our AI-powered tools immediately.</p>
+                            </div>
+
+                            <div class="mb-4">
+                                <h4 class="fs-4 text-dark mb-3">What kind of support do you offer?</h4>
+                                <p>We provide comprehensive support through multiple channels:</p>
+                                <ul>
+                                    <li>Detailed documentation and guides</li>
+                                    <li>Email support</li>
+                                    <li>Resource library</li>
+                                    <li>Community forums</li>
+                                </ul>
+                            </div>
+
+                            <div class="mb-4">
+                                <h4 class="fs-4 text-dark mb-3">How can I access the AI features?</h4>
+                                <p>AI features are available within your project dashboard. Simply create a new project and you'll find AI-powered tools for market analysis, content generation, and more.</p>
+                            </div>
+                        </div>
+
+                        <div class="mb-10">
+                            <h3 class="fs-2 text-dark mb-4">Getting Help</h3>
+                            <p class="mb-4">If you need additional assistance, you can:</p>
+                            <ul>
+                                <li>Email us at support@faas.com</li>
+                                <li>Check our <a href="{% url 'founder_assistance:startup_guide_overview' %}">Startup Guides</a></li>
+                                <li>Visit our <a href="{% url 'founder_assistance:resources' %}">Resources</a> section</li>
+                            </ul>
+                        </div>
+
+                        <div class="alert alert-primary d-flex align-items-center p-5 mb-10">
+                            <i class="ki-duotone ki-information-5 fs-2qx text-primary me-4"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>
+                            <div class="d-flex flex-column">
+                                <h4 class="mb-1 text-primary">Need Immediate Assistance?</h4>
+                                <span>Our support team is available Monday through Friday, 9:00 AM - 5:00 PM EST.</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!--end::Text-->
+                </div>
+                <!--end::Section-->
+            </div>
+            <!--end::Card body-->
+        </div>
+        <!--end::Card-->
+    </div>
+    <!--end::Container-->
+</div>
+<!--end::Content-->
+{% endblock content %}
