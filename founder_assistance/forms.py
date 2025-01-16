@@ -96,12 +96,60 @@ class ProjectForm(forms.ModelForm):
             'team_members', 'related_idea'
         ]
         widgets = {
-            'description': forms.Textarea(attrs={'rows': 4}),
-            'start_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
-            'end_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
-            'team_members': forms.SelectMultiple(attrs={'class': 'select2'}),
-            'budget': forms.NumberInput(attrs={'step': '0.01'}),
-            'earnings': forms.NumberInput(attrs={'step': '0.01'}),
+            'title': forms.TextInput(attrs={
+                'class': 'form-control form-control-lg form-control-solid',
+                'placeholder': 'Enter project title'
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'form-control form-control-lg form-control-solid',
+                'rows': 4,
+                'placeholder': 'Describe your project in detail'
+            }),
+            'status': forms.Select(attrs={
+                'class': 'form-select form-select-lg form-select-solid',
+                'data-control': 'select2',
+                'data-placeholder': 'Select status'
+            }),
+            'progress': forms.NumberInput(attrs={
+                'class': 'form-control form-control-lg form-control-solid',
+                'min': '0',
+                'max': '100',
+                'step': '1',
+                'placeholder': 'Enter progress percentage'
+            }),
+            'budget': forms.NumberInput(attrs={
+                'class': 'form-control form-control-lg form-control-solid',
+                'step': '0.01',
+                'min': '0',
+                'placeholder': 'Enter project budget'
+            }),
+            'earnings': forms.NumberInput(attrs={
+                'class': 'form-control form-control-lg form-control-solid',
+                'step': '0.01',
+                'min': '0',
+                'placeholder': 'Enter project earnings'
+            }),
+            'start_date': forms.DateInput(attrs={
+                'class': 'form-control form-control-lg form-control-solid',
+                'type': 'date'
+            }),
+            'end_date': forms.DateInput(attrs={
+                'class': 'form-control form-control-lg form-control-solid',
+                'type': 'date'
+            }),
+            'team_members': forms.SelectMultiple(attrs={
+                'class': 'form-select form-select-lg form-select-solid',
+                'data-control': 'select2',
+                'data-placeholder': 'Select team members',
+                'data-allow-clear': 'true',
+                'multiple': 'multiple'
+            }),
+            'related_idea': forms.Select(attrs={
+                'class': 'form-select form-select-lg form-select-solid',
+                'data-control': 'select2',
+                'data-placeholder': 'Select related idea',
+                'data-allow-clear': 'true'
+            }),
         }
 
 class ProjectTimelineForm(forms.ModelForm):

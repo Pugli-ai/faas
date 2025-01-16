@@ -33,6 +33,7 @@ from .views.startup_guide_views import (
     startup_guide_funding,
     startup_guide_marketing
 )
+from .views.static_page_views import about, support, contact
 
 app_name = 'founder_assistance'
 
@@ -76,4 +77,9 @@ urlpatterns = [
     path('startup-guide/marketing/', startup_guide_marketing, name='startup_guide_marketing'),
     
     path('resources/', views.resources, name='resources'),
+    
+    # Static Pages
+    path('about/', about, name='about'),
+    path('support/', support, name='support'),
+    path('contact/', contact, name='contact'),
 ]
