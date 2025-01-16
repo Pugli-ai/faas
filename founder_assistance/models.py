@@ -80,7 +80,7 @@ class Project(models.Model):
         return self.title
 
     def get_progress_percentage(self):
-        return f"{self.progress}%"
+        return self.progress
 
     def get_status_display_class(self):
         status_classes = {
