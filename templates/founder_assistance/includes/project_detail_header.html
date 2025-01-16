@@ -24,9 +24,6 @@
                     <!--begin::Actions-->
                     {% if request.user == project.creator or request.user in project.team_members.all %}
                     <div class="d-flex my-4">
-                        <a href="{% url 'founder_assistance:project_competitor_analysis' project.id %}" class="btn btn-sm btn-warning me-3">
-                            <i class="fas fa-search"></i> Competitor Analysis
-                        </a>
                         <a href="{% url 'founder_assistance:project_edit' project.id %}" class="btn btn-sm btn-primary me-3">
                             <i class="fas fa-cog"></i> Project Settings
                         </a>
