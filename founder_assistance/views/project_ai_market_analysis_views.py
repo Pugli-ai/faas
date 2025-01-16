@@ -40,6 +40,11 @@ def project_market_analysis(request, project_id):
                         'details': details
                     }, status=500)
                 
+                # Save the analysis to the database
+                project.market_analysis = analysis_result
+                project.save()
+                logger.info("Market analysis saved to database")
+                
                 # Return the markdown result
                 logger.info("Preparing to return successful response")
                 logger.debug(f"Analysis result: {analysis_result}")

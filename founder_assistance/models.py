@@ -63,6 +63,7 @@ class Project(models.Model):
     ai_response_raw = models.TextField(null=True, blank=True)  # Store raw AI response
     ai_response_json = models.JSONField(null=True, blank=True)  # Store structured JSON response
     personas_data = models.TextField(null=True, blank=True, help_text='JSON data for user personas')
+    market_analysis = models.TextField(null=True, blank=True, help_text='Markdown formatted market analysis')
     
     # Relationships
     creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_projects', null=True)

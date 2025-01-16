@@ -24,11 +24,19 @@
         <!-- Analysis Content -->
         <div id="analysisContent">
             <div id="marketAnalysisData">
-                <!-- Analysis will be rendered here -->
-                <div class="text-center p-5">
-                    <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
-                    <p>Click "Generate Analysis" to get detailed market insights for your project.</p>
-                </div>
+                {% if project.market_analysis %}
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            renderMarketAnalysis(`{{ project.market_analysis|escapejs }}`);
+                        });
+                    </script>
+                {% else %}
+                    <!-- Empty state -->
+                    <div class="text-center p-5">
+                        <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
+                        <p>Click "Generate Analysis" to get detailed market insights for your project.</p>
+                    </div>
+                {% endif %}
             </div>
         </div>
     </div>
