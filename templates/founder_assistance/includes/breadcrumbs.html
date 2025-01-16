@@ -1,0 +1,14 @@
+<ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+    {% for item in items %}
+        {% if not forloop.last %}
+            <li class="breadcrumb-item text-muted">
+                <a href="{{ item.url }}" class="text-muted text-hover-primary">{{ item.title }}</a>
+            </li>
+            <li class="breadcrumb-item">
+                <span class="bullet bg-gray-400 w-5px h-2px"></span>
+            </li>
+        {% else %}
+            <li class="breadcrumb-item text-dark">{{ item.title }}</li>
+        {% endif %}
+    {% endfor %}
+</ul>
