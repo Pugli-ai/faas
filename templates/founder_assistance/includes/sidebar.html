@@ -62,84 +62,35 @@
                     </div>
                     <!--end:Menu item-->
 
-                    <!--begin:Menu item-->
-                    <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
-                        <span class="menu-link">
+                    <!--begin:Create Idea-->
+                    <div class="menu-item">
+                        <a class="menu-link" href="{% url 'founder_assistance:idea_create' %}">
+                            <span class="menu-icon">
+                                <i class="fas fa-plus-circle fs-2"></i>
+                            </span>
+                            <span class="menu-title">Create an Idea</span>
+                        </a>
+                    </div>
+
+                    <!--begin:Ideas List-->
+                    <div class="menu-item">
+                        <a class="menu-link" href="{% url 'founder_assistance:idea_list' %}">
                             <span class="menu-icon">
                                 <i class="fas fa-lightbulb fs-2"></i>
                             </span>
                             <span class="menu-title">Ideas</span>
-                            <span class="menu-arrow"></span>
-                        </span>
-                        <div class="menu-sub menu-sub-accordion">
-                            <div class="menu-item">
-                                <a class="menu-link" href="{% url 'founder_assistance:idea_list' %}">
-                                    <span class="menu-bullet">
-                                        <span class="bullet bullet-dot"></span>
-                                    </span>
-                                    <span class="menu-title">AI-Enhanced Ideas</span>
-                                </a>
-                            </div>
-                            <div class="menu-item">
-                                <a class="menu-link" href="{% url 'founder_assistance:idea_create' %}">
-                                    <span class="menu-bullet">
-                                        <span class="bullet bullet-dot"></span>
-                                    </span>
-                                    <span class="menu-title">Create New Idea</span>
-                                </a>
-                            </div>
-                        </div>
+                        </a>
                     </div>
                     <!--end:Menu item-->
 
-                    <!--begin:Menu item-->
-                    <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
-                        <span class="menu-link">
+                    <!--begin:Projects-->
+                    <div class="menu-item">
+                        <a class="menu-link" href="{% url 'founder_assistance:project_list' %}">
                             <span class="menu-icon">
                                 <i class="fas fa-project-diagram fs-2"></i>
                             </span>
                             <span class="menu-title">Projects</span>
-                            <span class="menu-arrow"></span>
-                        </span>
-                        <div class="menu-sub menu-sub-accordion">
-                            <div class="menu-item">
-                                <a class="menu-link" href="{% url 'founder_assistance:project_list' %}">
-                                    <span class="menu-bullet">
-                                        <span class="bullet bullet-dot"></span>
-                                    </span>
-                                    <span class="menu-title">Active Projects</span>
-                                </a>
-                            </div>
-                            <div class="menu-item">
-                                <div class="menu-content">
-                                    <span class="menu-section text-muted text-uppercase fs-8 ls-1">Project Features:</span>
-                                </div>
-                            </div>
-                            <div class="menu-item">
-                                <span class="menu-link">
-                                    <span class="menu-bullet">
-                                        <i class="fas fa-check-circle text-success"></i>
-                                    </span>
-                                    <span class="menu-title text-muted">Progress Tracking</span>
-                                </span>
-                            </div>
-                            <div class="menu-item">
-                                <span class="menu-link">
-                                    <span class="menu-bullet">
-                                        <i class="fas fa-check-circle text-success"></i>
-                                    </span>
-                                    <span class="menu-title text-muted">Team Collaboration</span>
-                                </span>
-                            </div>
-                            <div class="menu-item">
-                                <span class="menu-link">
-                                    <span class="menu-bullet">
-                                        <i class="fas fa-check-circle text-success"></i>
-                                    </span>
-                                    <span class="menu-title text-muted">Budget Management</span>
-                                </span>
-                            </div>
-                        </div>
+                        </a>
                     </div>
                     <!--end:Menu item-->
 

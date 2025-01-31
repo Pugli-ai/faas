@@ -1,6 +1,10 @@
 {% extends 'founder_assistance/base.html' %}
 {% load idea_filters %}
 
+{% block extra_css %}
+<link href="/static/css/idea_card.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+
 {% block content %}
 <!--begin::Content container-->
 <div class="d-flex flex-column flex-column-fluid container-fluid">
@@ -26,7 +30,8 @@
 
 {% include 'founder_assistance/includes/idea_form_modal.html' %}
 
-{% block extra_scripts %}
+{% block extra_js %}
+    <script src="/static/js/custom/idea_card.js"></script>
     {% include 'founder_assistance/includes/idea_scripts.html' %}
 {% endblock %}
 {% endblock %}

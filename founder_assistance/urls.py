@@ -33,12 +33,13 @@ from .views.startup_guide_views import (
     startup_guide_funding,
     startup_guide_marketing
 )
-from .views.static_page_views import about, support, contact
+from .views.static_page_views import about, support, contact, landing
 
 app_name = 'founder_assistance'
 
 urlpatterns = [
-    path('', views.home, name='home'),
+    path('', landing, name='landing'),
+    path('home/', views.home, name='home'),
     path('login/', views.login_view, name='login'),
     path('logout/', LogoutView.as_view(next_page='founder_assistance:home'), name='logout'),
     path('signup/', views.signup_view, name='signup'),

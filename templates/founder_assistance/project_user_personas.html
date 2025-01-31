@@ -12,10 +12,16 @@
             <div class="card-header">
                 <h2 class="card-title fw-bold">User Personas</h2>
                 <div class="card-toolbar">
-                    <form method="post" class="me-3">
+                    <form method="post" class="me-3" id="generatePersonasForm">
                         {% csrf_token %}
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-magic me-2"></i>Generate Personas
+                        <button type="submit" class="btn btn-primary" id="generatePersonasBtn">
+                            <span class="indicator-label">
+                                <i class="fas fa-magic me-2"></i>Generate Personas
+                            </span>
+                            <span class="indicator-progress d-none">
+                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                Generating...
+                            </span>
                         </button>
                     </form>
                     <a href="{% url 'founder_assistance:project_detail' project.id %}" class="btn btn-light">
@@ -153,4 +159,19 @@
     <!--end::Content container-->
 </div>
 <!--end::Content-->
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('generatePersonasForm').addEventListener('submit', function(e) {
+    const btn = document.getElementById('generatePersonasBtn');
+    const labelEl = btn.querySelector('.indicator-label');
+    const progressEl = btn.querySelector('.indicator-progress');
+    
+    // Disable button and show loading state
+    btn.disabled = true;
+    labelEl.classList.add('d-none');
+    progressEl.classList.remove('d-none');
+});
+</script>
 {% endblock %}
