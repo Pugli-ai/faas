@@ -1,5 +1,6 @@
 # Git
 .git
+.github
 .gitignore
 
 # Python
@@ -27,13 +28,9 @@ media/
 *.log
 *.sqlite3
 
-#Environment variables
-env
-venv
-.env
-local.env
-
 # Docker files
 Dockerfile
 docker-compose.yml
+docker-compose.yaml
+docker-compose.dev.yaml
 README.md
