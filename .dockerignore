@@ -26,3 +26,14 @@ staticfiles/
 media/
 *.log
 *.sqlite3
+
+#Environment variables
+env
+venv
+.env
+local.env
+
+# Docker files
+Dockerfile
+docker-compose.yml
+README.md

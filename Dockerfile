@@ -1,31 +1,38 @@
-# Use an official Python runtime as a parent image
-FROM python:3.12
+# Here we are using a multi-stage build to reduce the size of the final image.
+# Stage 1: Build Stage
+FROM python:3.12 AS builder
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
-ENV DJANGO_SETTINGS_MODULE=ideapools.settings
-ENV STATIC_ROOT=/app/staticfiles
-ENV DEBUG=True
-ENV STATICFILES_STORAGE=django.contrib.staticfiles.storage.StaticFilesStorage
 
-# Set the working directory in the container
+# Set the working directory
 WORKDIR /app
 
-# Copy the current directory contents into the container at /app
+# Copy requirements file and install dependencies in a separate layer
+COPY requirements.txt /app/
+RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+
+# Stage 2: Production Image
+FROM python:3.12 AS final
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
+
+# Set working directory
+WORKDIR /app
+
+# Copy only necessary files from the build stage
+COPY --from=builder /install /usr/local
+
+# Copy application files
 COPY . /app
 
-# Install any needed packages specified in requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Make port 8000 available to the world outside this container
+# Expose port 8000
 EXPOSE 8000
 
-# Create necessary directories and prepare static files
+# Create necessary directories and collect static files
 RUN mkdir -p /app/staticfiles && \
-    mkdir -p /app/static/plugins/global && \
-    mkdir -p /app/static/plugins/custom/jstree/images/jstree && \
-    cp /app/static/plugins/custom/jstree/images/jstree/32px.png /app/static/plugins/custom/jstree/images/jstree/40px.png && \
     python manage.py collectstatic --noinput
 
-# Run manage.py when the container launches
-CMD ["uvicorn", "ideapools.asgi:application", "--host", "0.0.0.0", "--port","8000"]
+# Command to run the Django app with Gunicorn
+CMD ["gunicorn", "-b", "0.0.0.0:8000", "ideapools.wsgi:application"]
