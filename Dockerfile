@@ -30,9 +30,6 @@ COPY . /app
 # Expose port 8000
 EXPOSE 8000
 
-# Create necessary directories and collect static files
-RUN mkdir -p /app/staticfiles && \
-    python manage.py collectstatic --noinput
 
-# Command to run the Django app with Gunicorn
-CMD ["gunicorn", "-b", "0.0.0.0:8000", "ideapools.wsgi:application"]
+# Set the entrypoint for the app (using gunicorn to serve the Django app)
+CMD ["/bin/bash", "entrypoint.sh"]
