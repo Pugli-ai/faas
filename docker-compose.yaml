@@ -8,3 +8,21 @@ services:
     volumes:
       - .:/app
     restart: unless-stopped
+    depends_on:
+      - postgres
+  postgres:
+      container_name: idea_pools_postgres
+      image: postgres:13.3-alpine
+      restart: "unless-stopped"
+      environment:
+          POSTGRES_DB: faas_db
+          POSTGRES_USER: faas_db_user
+          POSTGRES_PASSWORD: faas-db-password-123
+      volumes:
+          - postgres_data:/var/lib/postgresql/data
+      ports:
+          - 5433:5432
+
+volumes:
+  postgres_data:
+    driver: local

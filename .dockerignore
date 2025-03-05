@@ -23,9 +23,11 @@ venv/
 Thumbs.db
 
 # Project specific
+staticfiles/
 media/
 *.log
 *.sqlite3
+db.sqlite3
 
 # Docker files
 Dockerfile
