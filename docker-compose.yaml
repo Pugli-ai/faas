@@ -15,9 +15,9 @@ services:
       image: postgres:13.3-alpine
       restart: "unless-stopped"
       environment:
-          POSTGRES_DB: faas_db
-          POSTGRES_USER: faas_db_user
-          POSTGRES_PASSWORD: faas-db-password-123
+        POSTGRES_DB: ${DB_NAME}
+        POSTGRES_USER: ${DB_USER}
+        POSTGRES_PASSWORD: ${DB_PASSWORD}
       volumes:
           - postgres_data:/var/lib/postgresql/data
       ports:
